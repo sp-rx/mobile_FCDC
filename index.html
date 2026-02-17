@@ -288,5 +288,154 @@ zoomBtn.addEventListener('click', () => {
 })();
 </script>
 
+
+
+
+<hr style="margin:60px 0">
+
+<h3>Astigmatism Simulation</h3>
+
+<canvas id="astigCanvas" width="600" height="250" 
+style="background:white; border:1px solid #ccc; border-radius:10px;"></canvas>
+
+<div style="margin-top:15px">
+  CYL:
+  <input type="range" id="cyl" min="0" max="3" step="0.25" value="1">
+  <span id="cylVal">1.00</span>
+</div>
+
+<div>
+  AXIS:
+  <input type="range" id="axis" min="0" max="180" step="1" value="180">
+  <span id="axisVal">180</span>
+</div>
+
+
+
+
+
+<script>
+const aCanvas = document.getElementById("astigCanvas");
+const aCtx = aCanvas.getContext("2d");
+
+const cylInput = document.getElementById("cyl");
+const axisInput = document.getElementById("axis");
+const cylVal = document.getElementById("cylVal");
+const axisVal = document.getElementById("axisVal");
+
+function directionalBlur(imageData, angle, strength) {
+    const w = imageData.width;
+    const h = imageData.height;
+    const src = imageData.data;
+    const output = aCtx.createImageData(w, h);
+    const dst = output.data;
+
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    const radius = Math.max(1, Math.floor(strength));
+
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+
+            let r=0,g=0,b=0,a=0,count=0;
+
+            for (let i = -radius; i <= radius; i++) {
+                let sx = Math.round(x + dx * i);
+                let sy = Math.round(y + dy * i);
+
+                if (sx>=0 && sx<w && sy>=0 && sy<h) {
+                    let index = (sy*w + sx)*4;
+                    r+=src[index];
+                    g+=src[index+1];
+                    b+=src[index+2];
+                    a+=src[index+3];
+                    count++;
+                }
+            }
+
+            let di = (y*w + x)*4;
+            dst[di]   = r/count;
+            dst[di+1] = g/count;
+            dst[di+2] = b/count;
+            dst[di+3] = a/count;
+        }
+    }
+    return output;
+}
+
+function drawAstig() {
+    aCtx.clearRect(0,0,aCanvas.width,aCanvas.height);
+
+    let cyl = parseFloat(cylInput.value);
+    let axis = parseFloat(axisInput.value);
+
+    cylVal.textContent = cyl.toFixed(2);
+    axisVal.textContent = axis;
+
+    let blurAngle = (axis + 90) * Math.PI / 180;
+    let blurStrength = cyl * 10;
+
+    // Draw multiple letters
+    const letters = ["A","E","I","O","U"];
+    const spacing = 100;
+    const startX = aCanvas.width/2 - (spacing * (letters.length-1))/2;
+
+    aCtx.fillStyle = "black";
+    aCtx.font = "bold 120px Arial";
+    aCtx.textAlign = "center";
+    aCtx.textBaseline = "middle";
+
+    letters.forEach((letter, index) => {
+        aCtx.fillText(
+            letter,
+            startX + index * spacing,
+            aCanvas.height/2
+        );
+    });
+
+    let imgData = aCtx.getImageData(0,0,aCanvas.width,aCanvas.height);
+    let blurred = directionalBlur(imgData, blurAngle, blurStrength);
+
+    aCtx.putImageData(blurred,0,0);
+}
+
+
+cylInput.addEventListener("input", drawAstig);
+axisInput.addEventListener("input", drawAstig);
+
+drawAstig();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
