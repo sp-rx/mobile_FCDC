@@ -80,7 +80,7 @@
   <!-- Step 1 -->
   <div class="section">
 
-  <h3>Step 1, Balance DC: Enter Add & Furthest balanced Length</h3>
+  <h3>Step 1, Balance DC: Enter Add & Nearest balanced Length</h3>
   <div>
     <label>Add (D):</label><input type="number" step="0.25" id="add1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -96,7 +96,7 @@
 
 
   <!-- Step 1B -->
-  <h3>Step 2, Breaking Point: Enter Add & Nearest before Blur</h3>
+  <h3>Step 2, Minimal Point: Enter Add & Nearest before Blur</h3>
   <div>
     <label>Add (D):</label><input type="number" step="0.25" id="add1b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
@@ -117,16 +117,25 @@
   <div>
 
     <label>Length(cm):</label>
-    <input type="number" step="1" id="wd1">    <button onclick="calculateAdd('wd1', 'result1', eyeAccommodation)">Balance</button>    <button onclick="calculateAdd('wd1', 'result1b', eyeAccommodationB)">Breaking</button>
+    <input type="number" step="1" id="wd1">
+<button onclick="
+  calculateAdd('wd1', 'result1', eyeAccommodation);
+  calculateAdd('wd1', 'result1b', eyeAccommodationB);
+">
+Calculate
+</button>
+
+<button style="display:none" onclick="calculateAdd('wd1', 'result1', eyeAccommodation)">Balance</button>
+<button style="display:none"  onclick="calculateAdd('wd1', 'result1b', eyeAccommodationB)">Minimal</button>
 <div style="height:10px"></div>
 
 
 <div>
-    Balance : <span id="result1"> - </span></div>
+    Balance <span id="result1"> ... </span></div>
 <div style="height:5px"></div>
 
 <div>
-    Breaking : <span id="result1b"> - <span></div>
+    Minimal <span id="result1b"> ... <span></div>
 
 <div style="height:10px"></div>
 
@@ -258,10 +267,9 @@ function toggleClass(className) {
     }
 
     function calculateAdd(inputId, resultId, accommodation) {
-      if (accommodation===null) { alert("Please calculate accommodation first."); return; }
+
 
       const wd = parseFloat(document.getElementById(inputId).value);
-      if (isNaN(wd) || wd <= 0) { alert("Enter a valid distance in cm."); return; }
 
       let addNeeded = 100/wd - accommodation;
       if (addNeeded<0) addNeeded=0;
@@ -282,7 +290,7 @@ function toggleClass(className) {
       if (eyeAccommodationB !== null) {
         const d2=[], a2=[];
         for (let d=5; d<=160; d++){ let add=100/d-eyeAccommodationB; if(add<0) add=0; if(add>5) add=5; d2.push(d); a2.push(add);}
-        datasets.push({label:'Breaking', data:d2.map((d,i)=>({x:d,y:a2[i]})), borderColor:'orange', fill:false, pointRadius:0});
+        datasets.push({label:'Minimal', data:d2.map((d,i)=>({x:d,y:a2[i]})), borderColor:'orange', fill:false, pointRadius:0});
       }
 
       const dotData=[];
