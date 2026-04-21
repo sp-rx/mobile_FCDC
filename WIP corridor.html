@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Progressive Corridor Gaze Analysis</title>
+
+  <style>
+    body { font-family: Arial; padding: 20px; }
+
+    input { margin: 5px; padding: 6px; width: 180px; }
+    button { padding: 8px 12px; margin-top: 10px; }
+
+    /* TABLE HIDDEN (as requested) */
+    table { display: none; }
+
+    .red { color: #ff0000; font-weight: bold; }
+    .green { color: #008000; font-weight: bold; }
+    .blue { color: #0066cc; font-weight: bold; }
+    .yellow { color: #cc9900; font-weight: bold; }
+
+    .scale-wrap {
+      margin-top: 20px;
+      max-width: 420px;
+      position: relative;
+    }
+
+    .scale-bar {
+      height: 22px;
+      width: 100%;
+      background: linear-gradient(to right, #ffd966, #4da6ff, #4CAF50, #ff4d4d);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      position: relative;
+	margin-top:50px;
+    }
+
+    .marker {
+      position: absolute;
+      top: -12px;
+      width: 2px;
+      height: 24px;
+      background: black;
+    }
+
+    .marker-label {
+      position: absolute;
+      top: -18px;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .legend {
+      margin-top: 10px;
+      font-size: 12px;
+      max-width: 420px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h3>Progressive Corridor Gaze Analysis</h3>
+
+<label>BVD (mm):</label><br>
+<input id="bvd" value="11"><br>
+
+<button onclick="calc()">Analyze</button>
+
+<div id="result"></div>
+
+<script>
+function getColor(angle) {
+    if (angle > 59) return "red";
+    if (angle >= 54) return "green";
+    if (angle >= 44) return "blue";
+    return "yellow";
+}
+
+function calc() {
+
+    let bvd = parseFloat(document.getElementById("bvd").value);
+
+    // REAL CORRIDORS (DO NOT CHANGE)
+    let corridors = [13, 15, 17, 19];
+
+    let minAngle = 40;
+    let maxAngle = 65;
+
+    let html = "";
+
+    // SCALE
+    html += "<div class='scale-wrap'>";
+    html += "<b>Corridor Length & Function</b>";
+    html += "<div class='scale-bar' id='scale'></div>";
+    html += "</div>";
+
+html += "<div class='legend'>";
+
+html += "<span class='yellow'>Yellow</span> = Near very good, Intermediate not good<br>";
+html += "<span class='blue'>Blue</span> = Normal Balanced Design<br>";
+html += "<span class='green'>Green</span> = Intermediate Priority, Near still good<br>";
+html += "<span class='red'>Red</span> = Intermediate very good, Near not good";
+
+html += "</div>";
+
+    document.getElementById("result").innerHTML = html;
+
+    let scale = document.getElementById("scale");
+
+    let markers = "";
+
+    corridors.forEach(c => {
+
+        let angle = Math.atan(c / bvd) * 180 / Math.PI;
+
+        let clamped = Math.max(minAngle, Math.min(maxAngle, angle));
+
+        let pos = ((clamped - minAngle) / (maxAngle - minAngle)) * 100;
+
+        // ONLY LABEL CHANGED (formula untouched)
+        let labelMap = {
+            13: 9,
+            15: 11,
+            17: 13,
+            19: 15
+        };
+
+        let label = labelMap[c] ?? c;
+
+        markers += `
+            <div class="marker" style="left:${pos}%;">
+                <div class="marker-label">${label}</div>
+            </div>
+        `;
+    });
+
+    scale.innerHTML = markers;
+}
+</script>
+
+</body>
+</html>
