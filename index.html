@@ -105,6 +105,7 @@
 
     <button onclick="calculateAccommodationB()">Calculate</button>
 <button onclick="clearLine2()">Clear</button>
+
   <div style="display:none" class="result" id="accommodationResultB"></div>
 <div style="height:10px"></div>
 
@@ -114,37 +115,70 @@
 
   <!-- Step 2 -->
 <div class="section">
-  <h3>Calculate Needed Add for Length</h3>
-  <h3>Ideal distance 40cm. Every 10cm difference is 20% visual field loss.</h3>
+  <h3>Calculate Needed Add for Near and Intermediate</h3>
 
-  <div>
+  <div style="display:flex; gap:20px;">
 
-    <label>Length(cm):</label>
-    <input type="number" step="1" id="wd1">
-<button onclick="
-  calculateAdd('wd1', 'result1', eyeAccommodation);
-  calculateAdd('wd1', 'result1b', eyeAccommodationB);
-">
-Calculate
-</button>
+    <!-- LEFT -->
+    <div style="flex:1;">
+      <label>Near (cm):</label>
+      <input type="number" step="1" id="wd1">
 
-<button style="display:none" onclick="calculateAdd('wd1', 'result1', eyeAccommodation)">Balance</button>
-<button style="display:none"  onclick="calculateAdd('wd1', 'result1b', eyeAccommodationB)">Minimal</button>
-<div style="height:10px"></div>
+      <button onclick="
+        calculateAdd('wd1', 'result1', eyeAccommodation);
+        calculateAdd('wd1', 'result1b', eyeAccommodationB);
+      ">
+      Calculate
+      </button>
 
+      <div style="height:10px"></div>
 
-<div>
-    Minimal Add Needed <span id="result1"> ... </span></div>
-<div style="height:5px"></div>
+      <div>
+        Minimal Add Needed <span id="result1"> ... </span>
+      </div>
 
-<div>
-    Balance Add Needed <span id="result1b"> ... </span></div>
+      <div style="height:5px"></div>
 
-<div style="height:10px"></div>
+      <div>
+        Balance Add Needed <span id="result1b"> ... </span>
+      </div>
+    </div>
 
-</div>
+    <!-- RIGHT -->
+    <div style="flex:1;">
+      <label>Intermediate (cm):</label>
+      <input type="number" step="1" id="wd2">
+
+      <button onclick="
+        calculateAdd('wd2', 'result2', eyeAccommodation);
+        calculateAdd('wd2', 'result2b', eyeAccommodationB);
+      ">
+      Calculate
+      </button>
+
+      <div style="height:10px"></div>
+
+      <div>
+        Minimal Add Needed <span id="result2"> ... </span>
+      </div>
+
+      <div style="height:5px"></div>
+
+      <div>
+        Balance Add Needed <span id="result2b"> ... </span>
+      </div>
+    </div>
 
   </div>
+
+  <div style="height:10px"></div>
+
+
+  <div style="height:50px"></div>
+
+  <label>
+    Ideal Multifocal Reading Distance 40cm. 20% visual field loss for every 10cm shorter or further.  </label>
+  <div style="height:10px"></div>
 
 </div>
 
@@ -194,313 +228,6 @@ Calculate
 </div>
 </div>
 <div style="height:10px"></div>
-
-
-
-
-
-
-
-
-<div class="section">
-<div style="background:#f1f1f1; border-radius:10px; padding:10px;">
-
-<h3>Lens Visual Fitting</h3>
-
-PH <input type="number" id="ph" value="30" step="1" oninput="updateVisual()">
-MRH <input type="number" id="mrh" value="17" step="1" oninput="updateVisual()">
-FH <input type="number" id="fh" value="28" step="1" oninput="updateVisual()">
-
-<br><br>
-
-<button onclick="setMode('distance')">Distance</button>
-<button onclick="setMode('balance')">Balance</button>
-<button onclick="setMode('reading')">Reading</button>
-
-<br><br>
-
-<button onclick="setCorridor(5)">4+5</button>
-<button onclick="setCorridor(7)">4+7</button>
-<button onclick="setCorridor(11)">4+11</button>
-<button onclick="setCorridor(15)">4+15</button>
-
-<br><br>
-
-<button onclick="setAddMode('balance')">Balance Add</button>
-<button onclick="setAddMode('minimal')">Minimal Add</button>
-
-<div style="display:flex; gap:10px; margin-top:25px; margin-left:20px; align-items:flex-end;">
-
-  <div id="frameScale"
-       style="position:relative; height:200px; width:100px; border-left:3px solid black;">
-  </div>
-
-  <div id="corridorScale"
-       style="position:relative; height:200px; width:140px; border-left:0px solid grey;">
-
-    <div id="fitTop"
-         style="position:absolute; left:0; width:100%; border-top:2px solid blue;"></div>
-
-    <div id="fitBottom"
-         style="position:absolute; left:0; width:100%; border-top:2px solid blue;"></div>
-
-  </div>
-
-</div>
-
-<div id="fitStatus" style="margin-top:10px; margin-left:20px; font-weight:bold;"></div>
-
-</div>
-</div>
-
-
-
-
-<script>
-let mode = "distance";
-let corridor = 5;
-let addMode = "balance";
-
-const scale = 6;
-const minMM = 7;
-const maxMM = 35;
-
-/* =========================
-   MODE CONTROL
-========================= */
-function setMode(m) {
-  mode = m;
-
-  const ph = parseFloat(document.getElementById("ph").value);
-  if (isNaN(ph)) return;
-
-  if (mode === "distance") document.getElementById("fh").value = ph - 4;
-  if (mode === "balance") document.getElementById("fh").value = ph - 2;
-  if (mode === "reading") document.getElementById("fh").value = ph;
-
-  updateVisual();
-}
-
-function setCorridor(c) {
-  corridor = c;
-  updateVisual();
-}
-
-function setAddMode(m) {
-  addMode = m;
-  updateVisual();
-}
-
-/* =========================
-   SCALE BUILDER
-========================= */
-function buildScale() {
-  const el = document.getElementById("frameScale");
-
-  for (let i = minMM; i <= maxMM; i++) {
-    const tick = document.createElement("div");
-
-    tick.style.position = "absolute";
-    tick.style.bottom = (i - minMM) * scale + "px";
-    tick.style.left = "0";
-
-    tick.style.width = (i % 5 === 0) ? "25px" : "12px";
-    tick.style.borderTop = (i % 5 === 0)
-      ? "2px solid black"
-      : "1px solid grey";
-
-    if (i % 5 === 0) {
-      const label = document.createElement("div");
-      label.innerText = i;
-      label.style.position = "absolute";
-      label.style.left = "30px";
-      label.style.bottom = "-7px";
-      label.style.fontSize = "10px";
-      tick.appendChild(label);
-    }
-
-    el.appendChild(tick);
-  }
-
-  el.appendChild(makeLine("phLine", "PH", "red"));
-  el.appendChild(makeLine("mrhLine", "MRH", "red"));
-}
-
-function makeLine(id, text, color) {
-  const line = document.createElement("div");
-
-  line.id = id;
-  line.style.position = "absolute";
-  line.style.left = "0";
-  line.style.width = "140%";
-  line.style.borderTop = `2px solid ${color}`;
-
-  const label = document.createElement("div");
-  label.innerText = text;
-  label.style.position = "absolute";
-  label.style.left = "150px";
-  label.style.top = "-8px";
-  label.style.fontSize = "11px";
-  label.style.fontWeight = "bold";
-  label.style.color = color;
-
-  line.appendChild(label);
-  return line;
-}
-
-/* =========================
-   MAIN UPDATE
-========================= */
-function updateVisual() {
-
-  const ph = parseFloat(document.getElementById("ph").value);
-  const mrh = parseFloat(document.getElementById("mrh").value);
-  const fh = parseFloat(document.getElementById("fh").value);
-
-  if (isNaN(ph) || isNaN(mrh) || isNaN(fh)) return;
-
-  const totalDrop = 4 + corridor;
-
-  const phPx = (ph - minMM) * scale;
-  const mrhPx = (mrh - minMM) * scale;
-  const fhPx = (fh - minMM) * scale;
-
-  /* FRAME LINES */
-  const frame = document.getElementById("frameScale");
-  frame.querySelector("#phLine").style.bottom = phPx + "px";
-  frame.querySelector("#mrhLine").style.bottom = mrhPx + "px";
-
-  /* CORRIDOR */
-  const bottomPx = fhPx - totalDrop * scale;
-
-  document.getElementById("fitTop").style.bottom = fhPx + "px";
-  document.getElementById("fitBottom").style.bottom = bottomPx + "px";
-
-  /* ZONES */
-  renderZones(fhPx, bottomPx);
-
-  /* INTERMEDIATE LINES (FIXED CALL LOCATION) */
-  drawIntermediateLines(fhPx, bottomPx);
-
-  /* FIT CHECK */
-  const fits = (fh - totalDrop) >= mrh;
-
-  const status = document.getElementById("fitStatus");
-  status.innerHTML = fits ? "Optimum" : "Not optimum";
-  status.style.color = fits ? "green" : "#b34700";
-}
-
-/* =========================
-   ZONES
-========================= */
-function renderZones(fhPx, bottomPx) {
-
-  document.querySelectorAll(".zone").forEach(e => e.remove());
-
-  const frame = document.getElementById("frameScale");
-
-  const dist = document.createElement("div");
-  dist.className = "zone";
-  dist.innerText = "Distance Zone";
-  dist.style.whiteSpace = "nowrap";
-  dist.style.position = "absolute";
-  dist.style.left = "200px";
-  dist.style.bottom = (fhPx + 10) + "px";
-  dist.style.fontSize = "11px";
-  dist.style.color = "blue";
-  dist.style.fontWeight = "bold";
-
-  frame.appendChild(dist);
-
-  const raw = (addMode === "minimal")
-    ? document.getElementById("result1").innerText
-    : document.getElementById("result1b").innerText;
-
-  const read = document.createElement("div");
-  read.className = "zone";
-  read.innerText = raw;
-  read.style.position = "absolute";
-  read.style.left = "200px";
-  read.style.bottom = (bottomPx - 20) + "px";
-  read.style.fontSize = "11px";
-  read.style.color = "blue";
-  read.style.fontWeight = "bold";
-
-  frame.appendChild(read);
-}
-
-/* =========================
-   INTERMEDIATE LINES (FIXED)
-========================= */
-function drawIntermediateLines(topPx, bottomPx) {
-
-  const container = document.getElementById("corridorScale");
-
-  // clear safely (prevents stacking bugs)
-  container.querySelectorAll(".midLine").forEach(e => e.remove());
-
-  const raw = (addMode === "minimal")
-    ? document.getElementById("result1").innerText
-    : document.getElementById("result1b").innerText;
-
-  const match = raw.match(/[\d.]+/);
-  if (!match) return;
-
-  // snap to 0.25 properly
-  let add = Math.round(parseFloat(match[0]) * 4) / 4;
-  if (isNaN(add)) return;
-
-  // zone logic
-  let zones = (add - 0.25) / 0.25;
-
-  let lines = Math.floor(zones - 1);
-
-  // IMPORTANT FIX: allow 0 but don't break system
-  if (lines < 0) lines = 0;
-  if (lines === 0) return;
-
-  const step = (topPx - bottomPx) / (lines + 1);
-
-  for (let i = 1; i <= lines; i++) {
-
-    const y = bottomPx + step * i;
-
-    const line = document.createElement("div");
-    line.className = "midLine";
-
-    line.style.position = "absolute";
-    line.style.left = "0";
-    line.style.width = "100%";
-    line.style.borderTop = "2px solid blue";
-    line.style.bottom = y + "px";
-
-    container.appendChild(line);
-  }
-}
-
-/* =========================
-   INIT
-========================= */
-buildScale();
-updateVisual();
-
-
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
