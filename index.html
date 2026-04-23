@@ -113,9 +113,34 @@
   </div>
 <div style="height:10px"></div>
 
-  <!-- Step 2 -->
+
+
+
 <div class="section">
-  <h3>Calculate Needed Add for Near and Intermediate</h3>
+
+
+
+<h3>Inset & Corridor Calculator</h3>
+<div>
+<label>Binocular PD (mm)</label>
+<input type="number" id="pd"> 
+
+
+
+<label>Vertex Distance (mm)</label>
+<input type="number" id="vd"><br><br>
+
+<label>Pupil Height (mm)</label>
+<input type="number" id="ph">
+
+
+<label>Eye Level Vision</label>
+<select id="fit">
+  <option value="0">Normal</option>
+  <option value="-2">Near Emphasis</option>
+  <option value="2">Far Emphasis</option>
+</select>
+</div><br><br>
 
   <div style="display:flex; gap:20px;">
 
@@ -171,16 +196,32 @@
 
   </div>
 
-  <div style="height:10px"></div>
 
 
-  <div style="height:50px"></div>
+<button onclick="calculate()">Calculate</button>
+
+<div class="result" id="output"></div>
+
+
+<div style="height:10px"></div>
 
   <label>
     Ideal Multifocal Reading Distance 40cm. 20% visual field loss for every 10cm shorter or further.  </label>
-  <div style="height:10px"></div>
+<div style="height:10px"></div>
+
 
 </div>
+
+
+
+
+
+
+<div style="height:10px"></div>
+
+
+
+
 
 
 <div style="display:none">
@@ -444,5 +485,85 @@ function clearLine2() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+<script>
+
+function roundCorridor(val) {
+  let options = [9, 11, 13, 15];
+  let closest = options[0];
+  let minDiff = Math.abs(val - closest);
+
+  for (let i = 1; i < options.length; i++) {
+    let diff = Math.abs(val - options[i]);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closest = options[i];
+    }
+  }
+
+  return closest;
+}
+
+
+
+function calculate() {
+
+  let pd = parseFloat(document.getElementById("pd").value);
+  let wd_cm = parseFloat(document.getElementById("wd1").value);
+  let vd = parseFloat(document.getElementById("vd").value);
+  let ph = parseFloat(document.getElementById("ph").value);
+  let offset = parseFloat(document.getElementById("fit").value);
+
+  if (isNaN(pd) || isNaN(wd_cm) || isNaN(vd) || isNaN(ph)) {
+    document.getElementById("output").innerHTML = "Fill all fields";
+    return;
+  }
+
+  // Convert WD to mm
+  let wd = wd_cm * 10;
+
+  // --- Inset (per eye) ---
+  let inset = (pd/2) - (wd * (pd/2) / (wd + vd));
+
+  // --- Fitting Height ---
+  let fittingHeight = ph - offset;
+
+  // --- Corridor (PURE vertex projection) ---
+  function corridor(angle) {
+    return vd * Math.tan(angle * Math.PI / 180);
+  }
+
+let fitOffset = parseFloat(document.getElementById("fit").value);
+
+let corr45 = roundCorridor(corridor(45) - fitOffset - 3);
+let corr50 = roundCorridor(corridor(50) - fitOffset - 3);
+let corr55 = roundCorridor(corridor(55) - fitOffset - 3);
+
+  // --- Output ---
+  document.getElementById("output").innerHTML = `
+    <b>Inset (per eye):</b> ${inset.toFixed(2)} mm<br><br>
+
+    <b>Adjusted Fitting Height:</b> ${fittingHeight.toFixed(2)} mm<br><br>
+
+    <b>Zone Type to Corridor Choice</b><br>
+    Bigger Near Zone : ${corr45.toFixed(2)} mm<br>
+    Balance Zone : ${corr50.toFixed(2)} mm<br>
+    Bigger Mid Zone : ${corr55.toFixed(2)} mm
+  `;
+}
+</script>
+
 </body>
 </html>
+
+
+
