@@ -2,568 +2,409 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Accommodation & Add Calculator</title>
+  <title>Kiara Optometry Accommodation & Add Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 5px;
-      font-size:12px;
-      background:#d1d1d1; 
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #e5e5e5; padding: 1.5rem; }
+    .page { max-width: 680px; margin: auto; }
+    h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.5rem; }
+    h2 { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 1rem; }
+    .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .row { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label { font-size: 11px; color: #666; }
+    .field input, .field select {
+      font-size: 13px; padding: 6px 10px;
+      border: 1px solid #ccc; border-radius: 8px;
+      background: #f7f7f7; color: #111; width: 100px;
     }
-    button {
-      border-radius:6px;
-      padding: 5px;
-      font-size:11px; 
-      margin:0px 5px;
+    .field select { width: 160px; }
+    .field input:focus { outline: none; border-color: #888; }
+    .btn {
+      font-size: 12px; padding: 7px 14px;
+      border: 1px solid #ccc; border-radius: 8px;
+      background: transparent; color: #111;
+      cursor: pointer; white-space: nowrap;
     }
-    input {
-      width: 60px;
-      margin:0 10px;
-      border-radius:6px;
-      height:20px;
-      font-size:11px
+    .btn:hover { background: #f0f0f0; }
+    .btn.active { background: #fef9c3; border-color: #ca8a04; color: #78350f; }
+    .btn-sm { font-size: 11px; padding: 4px 10px; }
+    .result-box {
+      background: #f5f5f5; border-radius: 8px;
+      padding: 0.75rem 1rem; font-size: 13px; color: #111;
     }
-    label {
-      display: inline-block;
+    .result-label { font-size: 11px; color: #888; margin-bottom: 2px; }
+    .result-val { font-size: 15px; font-weight: 600; color: #111; }
+    .divider { border: none; border-top: 1px solid #eee; margin: 1rem 0; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .inline-result { font-size: 13px; color: #666; margin-top: 4px; }
+    .inline-result span { font-weight: 600; color: #111; }
+    .info-note { font-size: 12px; color: #888; line-height: 1.5; margin-top: 0.5rem; }
+    .duochrome-img {
+      width: 100%; height: 300px; object-fit: cover;
+      object-position: center 17%; border-radius: 8px; margin-top: 0.5rem;
     }
-    .result {
-      margin-top: 20px;
-      font-weight: bold;
+    .toggle-btn {
+      font-size: 11px; padding: 3px 10px;
+      border: 1px solid #ddd; border-radius: 20px;
+      background: transparent; color: #888; cursor: pointer;
     }
-    canvas {
-      margin-top: 30px;
+    .toggle-btn:hover { background: #f0f0f0; }
+    .slider-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 0.75rem; font-size: 12px; color: #666;
     }
-   .section {
-      border:1px dotted grey;
-      padding:2px 20px;
-      border-radius:10px;
-      background: #f1f1f1;
-    }
-  /* Add this */
-  button.active {
-    background-color: yellow;
-  }
+    .slider-row input[type=range] { flex: 1; }
+    .output-cell { background: #f5f5f5; border-radius: 8px; padding: 0.6rem 0.75rem; }
+    .output-cell .lbl { font-size: 10px; color: #888; margin-bottom: 2px; }
+    .output-cell .val { font-size: 14px; font-weight: 600; color: #111; }
+    .section-title { font-size: 13px; font-weight: 500; color: #888; margin-bottom: 0.5rem; }
   </style>
 </head>
 <body>
-  <h2>Kiara Optometry Accommodation & Add Calculator</h2>
+<div class="page">
+  <h1>Kiara Optometry — Accommodation &amp; Add Calculator</h1>
 
-
-
-<div class="section">
-  <h3>Duochrome  <button onclick="toggleClass('toggleable')">Hide / Show</button>
-</h3>
-
-  <div class="toggleable" style="display:none">
-
-<div style="overflow:hidden;">
-  <img src="https://raw.githubusercontent.com/kiaraoptometrypx/mobile_test/main/Near.png"
-       style="
-         width:100%;
-         height:390px;          /* set your desired visible height */
-         object-fit:cover;
-         object-position:center 17%; 
-       ">
-</div>
-
-</div>
-</div>
-
-
-
-
-<div style="height:10px"></div>
-
-  <!-- Step 1 -->
-  <div class="section">
-
-  <h3>Minimal Add: Pull nearer and stop when both side blur.</h3>
-  <div>
-    <label>Add (D):</label><input type="number" step="0.25" id="add1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-    <label>Length (cm):</label><input type="number" step="1" id="np1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-    <button onclick="calculateAccommodation()">Calculate</button>
-<button onclick="clearLine1()">Clear</button>
-
-  <div style="display:none"  class="result" id="accommodationResult"></div>
-<div style="height:10px"></div>
-
-</div>
-
-
-  <!-- Step 1B -->
-  <h3>Balance Add: From Blur Point, push away until both side clear.</h3>
-  <div>
-    <label>Add (D):</label><input type="number" step="0.25" id="add1b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-    <label>Length (cm):</label><input type="number" step="1" id="np1b">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-    <button onclick="calculateAccommodationB()">Calculate</button>
-<button onclick="clearLine2()">Clear</button>
-
-  <div style="display:none" class="result" id="accommodationResultB"></div>
-<div style="height:10px"></div>
-
-</div>
-  </div>
-<div style="height:10px"></div>
-
-
-
-
-<div class="section">
-
-
-
-<h3>Inset & Corridor Calculator</h3>
-<div>
-<label>Binocular PD (mm)</label>
-<input type="number" id="pd"> 
-
-
-
-<label>Vertex Distance (mm)</label>
-<input type="number" id="vd"><br><br>
-
-<label>Pupil Height (mm)</label>
-<input type="number" id="ph">
-
-
-<label>Eye Level Vision</label>
-<select id="fit">
-  <option value="0">Normal</option>
-  <option value="-2">Near Emphasis</option>
-  <option value="2">Far Emphasis</option>
-</select>
-</div><br><br>
-
-  <div style="display:flex; gap:20px;">
-
-    <!-- LEFT -->
-    <div style="flex:1;">
-      <label>Near (cm):</label>
-      <input type="number" step="1" id="wd1">
-
-      <button onclick="
-        calculateAdd('wd1', 'result1', eyeAccommodation);
-        calculateAdd('wd1', 'result1b', eyeAccommodationB);
-      ">
-      Calculate
-      </button>
-
-      <div style="height:10px"></div>
-
-      <div>
-        Minimal Add Needed <span id="result1"> ... </span>
-      </div>
-
-      <div style="height:5px"></div>
-
-      <div>
-        Balance Add Needed <span id="result1b"> ... </span>
-      </div>
+  <!-- DUOCHROME -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="margin:0">Duochrome</h2>
+      <button class="toggle-btn" onclick="toggle('duo-body')">Show / Hide</button>
     </div>
-
-    <!-- RIGHT -->
-    <div style="flex:1;">
-      <label>Intermediate (cm):</label>
-      <input type="number" step="1" id="wd2">
-
-      <button onclick="
-        calculateAdd('wd2', 'result2', eyeAccommodation);
-        calculateAdd('wd2', 'result2b', eyeAccommodationB);
-      ">
-      Calculate
-      </button>
-
-      <div style="height:10px"></div>
-
-      <div>
-        Minimal Add Needed <span id="result2"> ... </span>
-      </div>
-
-      <div style="height:5px"></div>
-
-      <div>
-        Balance Add Needed <span id="result2b"> ... </span>
-      </div>
+    <div id="duo-body" style="display:none">
+      <img src="https://raw.githubusercontent.com/kiaraoptometrypx/mobile_test/main/Near.png" class="duochrome-img">
     </div>
-
   </div>
 
-
-
-<button onclick="calculate()">Calculate</button>
-
-<div class="result" id="output"></div>
-
-
-<div style="height:10px"></div>
-
-  <label>
-    Ideal Multifocal Reading Distance 40cm. 20% visual field loss for every 10cm shorter or further.  </label>
-<div style="height:10px"></div>
-
-
+  <!-- MINIMAL & BALANCE ADD -->
+  <div class="card">
+    <h2>Minimal add, Red Side Blur</h2>
+    <p class="section-title" style="margin-bottom:0.75rem">Pull nearer and stop when RED side blurrier</p>
+    <div class="row">
+      <div class="field"><label>Add (D)</label><input type="number" step="0.25" id="add1"></div>
+      <div class="field"><label>Length (cm)</label><input type="number" step="1" id="np1"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="btn1" onclick="calcAccom()">Calculate</button>
+        <button class="btn btn-sm" onclick="clearLine1()">Clear</button>
+      </div>
+    </div>
+<div  style="display:none" >
+    <div id="res1" style="display:none" class="result-box">
+      <div class="result-label">Eye accommodation</div>
+      <div class="result-val" id="res1val">—</div>
+    </div>
 </div>
 
+    <hr class="divider">
 
-
-
-
-
-<div style="height:10px"></div>
-
-
-
-
-
-
+    <h2>Balance add, Both Side Clear</h2>
+    <p class="section-title" style="margin-bottom:0.75rem">From blur point, push away until both sides clear</p>
+    <div class="row">
+      <div class="field"><label>Add (D)</label><input type="number" step="0.25" id="add1b"></div>
+      <div class="field"><label>Length (cm)</label><input type="number" step="1" id="np1b"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="btn1b" onclick="calcAccomB()">Calculate</button>
+        <button class="btn btn-sm" onclick="clearLine2()">Clear</button>
+      </div>
+    </div>
 <div style="display:none">
-
-  <div>
-    <label>Distance 2 (cm):</label>
-    <input type="number" step="0.1" id="wd2">
-    <button onclick="calculateAdd('wd2', 'result2', eyeAccommodation)">Line 1</button>
-    <button onclick="calculateAdd('wd2', 'result2b', eyeAccommodationB)">Line 2 Add</button>
-    <div class="result" id="result2"></div>
-    <div class="result" id="result2b"></div>
+    <div id="res1b" style="display:none" class="result-box">
+      <div class="result-label">Eye accommodation (balance)</div>
+      <div class="result-val" id="res1bval">—</div>
+    </div>
+</div>
   </div>
 
-</div>
-<div style="height:10px"></div>
+  <!-- INSET & CORRIDOR -->
+  <div class="card">
+    <h2>Inset, corridor &amp; add calculator</h2>
+    <div class="row">
+      <div class="field"><label>Binocular PD (mm)</label><input type="number" id="pd"></div>
+      <div class="field"><label>Vertex distance (mm)</label><input type="number" id="vd"></div>
+      <div class="field"><label>Pupil height (mm)</label><input type="number" id="ph"></div>
+      <div class="field"><label>Eye-level vision</label>
+        <select id="fit">
+          <option value="0">Normal</option>
+          <option value="-2">Near emphasis</option>
+          <option value="2">Far emphasis</option>
+        </select>
+      </div>
+    </div>
 
+    <div class="two-col" style="margin-top:0.25rem">
+      <div>
+        <div class="section-title">Near</div>
+        <div class="row">
+          <div class="field"><label>Distance (cm)</label><input type="number" step="1" id="wd1"></div>
+<button class="btn" id="btnWd1" onclick="calcBothWd1()">Calculate</button>
+        </div>
+        <div style="display:none" class="inline-result">Minimal add: <span id="result1">—</span></div>
+        <div class="inline-result">Balance add: <span id="result1b">—</span></div>
+      </div>
+      <div>
+        <div class="section-title">Intermediate</div>
+        <div class="row">
+          <div class="field"><label>Distance (cm)</label><input type="number" step="1" id="wd2"></div>
+<button class="btn" id="btnWd2" onclick="calcBothWd2()">Calculate</button>
+        </div>
+        <div style="display:none" class="inline-result">Minimal add: <span id="result2">—</span></div>
+        <div class="inline-result">Balance add: <span id="result2b">—</span></div>
+      </div>
+    </div>
 
-<div class="section">
+    <hr class="divider">
 
-  <!-- Working distance sliders -->
-  <h3>Working Distance <button onclick="toggleClass('toggleable2')">Hide / Show</button>
-</h3>
-
-
-
-
-  <div class="toggleable2" style="display:none">
-<div>
-    <label style="width:120px">Min & Max Length:</label>
-    <input style="width:120px" type="range" id="leftSlider" min="0" max="70" value="20" step="5">
-    <span id="leftValue">20</span>cm
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <input style="width:120px" type="range" id="rightSlider" min="50" max="150" value="70" step="5">
-    <span id="rightValue">70</span>cm
+<button class="btn" id="btnMain" onclick="calculate()">Calculate inset & corridor</button>
+    <div id="output" style="margin-top:0.75rem"></div>
+    <p class="info-note" style="margin-top:0.75rem">Ideal multifocal reading distance 40 cm. 20% visual field loss for every 10 cm shorter or further.</p>
   </div>
 
-
-
-
-<div style="height:10px"></div>
-
-
-  <canvas id="addGraph" width="600" height="400"></canvas>
-
+  <!-- WORKING DISTANCE GRAPH -->
+  <div class="card">
+    <div class="card-header">
+      <h2 style="margin:0">Working distance graph</h2>
+      <button class="toggle-btn" onclick="toggle('graph-body')">Show / Hide</button>
+    </div>
+    <div id="graph-body" style="display:none">
+      <div class="slider-row">
+        <span style="min-width:80px">Min (cm)</span>
+        <input type="range" id="leftSlider" min="0" max="70" value="20" step="5">
+        <span id="leftValue" style="min-width:24px">20</span>
+      </div>
+      <div class="slider-row">
+        <span style="min-width:80px">Max (cm)</span>
+        <input type="range" id="rightSlider" min="50" max="150" value="70" step="5">
+        <span id="rightValue" style="min-width:24px">70</span>
+      </div>
+      <canvas id="addGraph" style="margin-top:0.5rem;width:100%;max-height:320px"></canvas>
+    </div>
+  </div>
 </div>
-</div>
-<div style="height:10px"></div>
-
-
-
-
-
-
-
-
-<div style="height:100px"></div>
 
 <script>
-function toggleClass(className) {
-  const elements = document.getElementsByClassName(className);
-  for (let el of elements) {
-    // toggle between block and none
-    el.style.display = (el.style.display === "none") ? "block" : "none";
-  }
-}
-</script>
+let eyeAccommodation = null;
+let eyeAccommodationB = null;
+let chart = null;
 
-  <script>
-    let eyeAccommodation = null;
-    let eyeAccommodationB = null;
-    let chart = null;
-
-    const leftSlider = document.getElementById("leftSlider");
-    const rightSlider = document.getElementById("rightSlider");
-    const leftValue = document.getElementById("leftValue");
-    const rightValue = document.getElementById("rightValue");
-
-    leftSlider.addEventListener("input", updateAxis);
-    rightSlider.addEventListener("input", updateAxis);
-
-    function updateAxis() {
-      let minX = parseFloat(leftSlider.value);
-      let maxX = parseFloat(rightSlider.value);
-
-      if (minX < -25) minX = -25;
-      if (minX > 70) minX = 70;
-      if (maxX < 50) maxX = 50;
-      if (maxX > 150) maxX = 150;
-
-      leftValue.textContent = minX;
-      rightValue.textContent = maxX;
-
-      if (chart) {
-        chart.options.scales.x.min = minX;
-        chart.options.scales.x.max = maxX;
-        chart.update();
-      }
-    }
-
-    function calculateAccommodation() {
-      const add1 = parseFloat(document.getElementById("add1").value);
-      const np1 = parseFloat(document.getElementById("np1").value);
-
-      if (isNaN(add1) || isNaN(np1) || np1 <= 0) {
-        alert("Enter a valid add + near point.");
-        return;
-      }
-
-      eyeAccommodation = 100/np1 - add1;
-      const nearPoint = 100/eyeAccommodation;
-
-      document.getElementById("accommodationResult").innerHTML =
-        `Eye Accommodation: ${eyeAccommodation.toFixed(2)} D`;
-
-      plotGraph();
-    }
-
-function roundUp025(v) {
-  return Math.ceil(v * 4) / 4;
+function toggle(id) {
+  const el = document.getElementById(id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
-    function calculateAccommodationB() {
-      const add1b = parseFloat(document.getElementById("add1b").value);
-      const np1b = parseFloat(document.getElementById("np1b").value);
+function roundUp025(v) { return Math.ceil(v * 4) / 4; }
 
-      if (isNaN(add1b) || isNaN(np1b) || np1b <= 0) {
-        alert("Enter a valid add + near point for line B.");
-        return;
-      }
+function calcAccom() {
+  const add1 = parseFloat(document.getElementById('add1').value);
+  const np1 = parseFloat(document.getElementById('np1').value);
+  if (isNaN(add1) || isNaN(np1) || np1 <= 0) { alert('Enter a valid add + near point.'); return; }
+  eyeAccommodation = 100 / np1 - add1;
+  document.getElementById('res1val').textContent = eyeAccommodation.toFixed(2) + ' D';
+  document.getElementById('res1').style.display = 'block';
+  document.getElementById('btn1').classList.add('active');
+  plotGraph();
+}
 
-      eyeAccommodationB = 100/np1b - add1b;
-      const nearPointB = 100/eyeAccommodationB;
-
-      document.getElementById("accommodationResultB").innerHTML =
-        `Eye Accommodation B: ${eyeAccommodationB.toFixed(2)} D`;
-
-      plotGraph();
-    }
-
-    function calculateAdd(inputId, resultId, accommodation) {
-
-
-      const wd = parseFloat(document.getElementById(inputId).value);
-
-      let addNeeded = 100/wd - accommodation;
-      if (addNeeded<0) addNeeded=0;
-      if (addNeeded>4) addNeeded=4;
-
-document.getElementById(resultId).innerHTML =
-  `+${roundUp025(addNeeded).toFixed(2)}`;
-    }
-
-    function plotGraph() {
-      const datasets = [];
-
-      if (eyeAccommodation !== null) {
-        const d1=[], a1=[];
-        for (let d=5; d<=160; d++){ let add=100/d-eyeAccommodation; if(add<0) add=0; if(add>5) add=5; d1.push(d); a1.push(add);}
-        datasets.push({label:'Minimal', data:d1.map((d,i)=>({x:d,y:a1[i]})), borderColor:'grey', fill:false, pointRadius:0});
-      }
-
-      if (eyeAccommodationB !== null) {
-        const d2=[], a2=[];
-        for (let d=5; d<=160; d++){ let add=100/d-eyeAccommodationB; if(add<0) add=0; if(add>5) add=5; d2.push(d); a2.push(add);}
-        datasets.push({label:'Balance', data:d2.map((d,i)=>({x:d,y:a2[i]})), borderColor:'orange', fill:false, pointRadius:0});
-      }
-
-      const dotData=[];
-      for (let addVal=0.5; addVal<=5; addVal+=0.5){
-        if(eyeAccommodation!==null){ let wd=100/(eyeAccommodation+addVal); if(wd>=5 && wd<=70) dotData.push({x:wd,y:addVal}); }
-        if(eyeAccommodationB!==null){ let wdB=100/(eyeAccommodationB+addVal); if(wdB>=5 && wdB<=70) dotData.push({x:wdB,y:addVal}); }
-      }
-      datasets.push({label:'Add', data:dotData, pointBackgroundColor:'red', pointRadius:5, showLine:false});
-
-
-
-      const ctx=document.getElementById('addGraph').getContext('2d');
-      if(chart) chart.destroy();
-      chart=new Chart(ctx,{
-        type:'line',
-        data:{datasets},
-        options:{
-          responsive:true,
-          interaction:{mode:'nearest', intersect:true},
-          plugins:{tooltip:{callbacks:{
-            title: c=>`WD: ${c[0].raw.x.toFixed(1)} cm`,
-            label: c=>`${c[0].raw.y.toFixed(2)} D`
-          }}},
-          scales:{
-            x:{type:'linear', title:{display:true,text:'Working Distance (cm)'}, min:20, max:70},
-            y:{title:{display:true,text:'Add (D)'}, min:0, max:3.5}
-          }
-        }
-      });
-    }
-
+function calcAccomB() {
+  const add1b = parseFloat(document.getElementById('add1b').value);
+  const np1b = parseFloat(document.getElementById('np1b').value);
+  if (isNaN(add1b) || isNaN(np1b) || np1b <= 0) { alert('Enter a valid add + near point.'); return; }
+  eyeAccommodationB = 100 / np1b - add1b;
+  document.getElementById('res1bval').textContent = eyeAccommodationB.toFixed(2) + ' D';
+  document.getElementById('res1b').style.display = 'block';
+  document.getElementById('btn1b').classList.add('active');
+  plotGraph();
+}
 
 function clearLine1() {
   eyeAccommodation = null;
-  document.getElementById("accommodationResult").innerHTML = '';
+  document.getElementById('res1').style.display = 'none';
+  document.getElementById('btn1').classList.remove('active');
+  document.getElementById('add1').value = '';
+  document.getElementById('np1').value = '';
   plotGraph();
 }
 
 function clearLine2() {
   eyeAccommodationB = null;
-  document.getElementById("accommodationResultB").innerHTML = '';
+  document.getElementById('res1b').style.display = 'none';
+  document.getElementById('btn1b').classList.remove('active');
+  document.getElementById('add1b').value = '';
+  document.getElementById('np1b').value = '';
   plotGraph();
 }
 
-
-
-
-
-  </script>
-
-<script>
-  // Map each button to its own relevant inputs
-  const buttonInputMap = {
-    'calculateAccommodation': ['add1','np1'],
-    'calculateAccommodationB': ['add1b','np1b']
-  };
-
-  Object.keys(buttonInputMap).forEach(fnName=>{
-    const btn = document.querySelector(`button[onclick="${fnName}()"]`);
-    const inputs = buttonInputMap[fnName].map(id=>document.getElementById(id));
-
-    if(btn){
-      // Highlight on click
-      btn.addEventListener('click', ()=>{
-        btn.classList.add('active');
-        // store original values
-        inputs.forEach(input=>{
-          input.dataset.original = input.value;
-        });
-      });
-
-      // Remove highlight if any associated input changes
-      inputs.forEach(input=>{
-        input.addEventListener('input', ()=>{
-          btn.classList.remove('active');
-        });
-      });
-    }
-  });
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<script>
-
-function roundCorridor(val) {
-  let options = [9, 11, 13, 15];
-  let closest = options[0];
-  let minDiff = Math.abs(val - closest);
-
-  for (let i = 1; i < options.length; i++) {
-    let diff = Math.abs(val - options[i]);
-    if (diff < minDiff) {
-      minDiff = diff;
-      closest = options[i];
-    }
-  }
-
-  return closest;
-}
-
-
-
-function calculate() {
-
-  let pd = parseFloat(document.getElementById("pd").value);
-  let wd_cm = parseFloat(document.getElementById("wd1").value);
-  let vd = parseFloat(document.getElementById("vd").value);
-  let ph = parseFloat(document.getElementById("ph").value);
-  let offset = parseFloat(document.getElementById("fit").value);
-
-  if (isNaN(pd) || isNaN(wd_cm) || isNaN(vd) || isNaN(ph)) {
-    document.getElementById("output").innerHTML = "Fill all fields";
+function calculateAdd(inputId, resultId, accommodation) {
+  const wd = parseFloat(document.getElementById(inputId).value);
+  if (isNaN(wd) || wd <= 0) {
+    document.getElementById(resultId).textContent = '—';
     return;
   }
 
-  // Convert WD to mm
-  let wd = wd_cm * 10;
+  let addNeeded = 100 / wd - accommodation;
 
-  // --- Inset (per eye) ---
-  let inset = (pd/2) - (wd * (pd/2) / (wd + vd));
+  if (addNeeded < 0) addNeeded = 0;
+  if (addNeeded > 4) addNeeded = 4;
 
-  // --- Fitting Height ---
-  let fittingHeight = ph - offset;
+  let finalAdd = roundUp025(addNeeded);
 
-  // --- Corridor (PURE vertex projection) ---
-  function corridor(angle) {
-    return vd * Math.tan(angle * Math.PI / 180);
+  // ONLY for result1b (balance)
+  if (resultId === 'result1b') {
+    finalAdd -= 0.25;
+    if (finalAdd < 0) finalAdd = 0;
   }
 
-let fitOffset = parseFloat(document.getElementById("fit").value);
+  document.getElementById(resultId).textContent =
+    '+' + finalAdd.toFixed(2);
+}
 
-let corr45 = roundCorridor(corridor(45) - fitOffset - 3);
-let corr50 = roundCorridor(corridor(50) - fitOffset - 3);
-let corr55 = roundCorridor(corridor(55) - fitOffset - 3);
+function calcBothWd1() {
+  if (eyeAccommodation !== null) calculateAdd('wd1', 'result1', eyeAccommodation);
+  if (eyeAccommodationB !== null) calculateAdd('wd1', 'result1b', eyeAccommodationB);
+}
 
-  // --- Output ---
-  document.getElementById("output").innerHTML = `
-    <b>Inset (per eye):</b> ${inset.toFixed(2)} mm<br><br>
+function calcBothWd2() {
+  if (eyeAccommodation !== null) calculateAdd('wd2', 'result2', eyeAccommodation);
+  if (eyeAccommodationB !== null) calculateAdd('wd2', 'result2b', eyeAccommodationB);
+}
 
-    <b>Adjusted Fitting Height:</b> ${fittingHeight.toFixed(2)} mm<br><br>
+function roundCorridor(val) {
+  let options = [9, 11, 13, 15];
+  return options.reduce((a, b) => Math.abs(b - val) < Math.abs(a - val) ? b : a);
+}
 
-    <b>Zone Type to Corridor Choice</b><br>
-    Bigger Near Zone : ${corr45.toFixed(2)} mm<br>
-    Balance Zone : ${corr50.toFixed(2)} mm<br>
-    Bigger Mid Zone : ${corr55.toFixed(2)} mm
+function calculate() {
+  const pd = parseFloat(document.getElementById('pd').value);
+  const wd_cm = parseFloat(document.getElementById('wd1').value);
+  const vd = parseFloat(document.getElementById('vd').value);
+  const ph = parseFloat(document.getElementById('ph').value);
+  const offset = parseFloat(document.getElementById('fit').value);
+  if (isNaN(pd) || isNaN(wd_cm) || isNaN(vd) || isNaN(ph)) {
+    document.getElementById('output').innerHTML = '<span style="color:#888;font-size:13px">Please fill all fields above.</span>';
+    return;
+  }
+  const wd = wd_cm * 10;
+  const inset = (pd / 2) - (wd * (pd / 2) / (wd + vd));
+  const fittingHeight = ph - offset;
+  function corridor(angle) { return vd * Math.tan(angle * Math.PI / 180); }
+  const corr45 = roundCorridor(corridor(45) - offset - 3);
+  const corr50 = roundCorridor(corridor(50) - offset - 3);
+  const corr55 = roundCorridor(corridor(55) - offset - 3);
+  document.getElementById('output').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div class="output-cell"><div class="lbl">Inset (per eye)</div><div class="val">${inset.toFixed(2)} mm</div></div>
+      <div class="output-cell"><div class="lbl">Adjusted fitting height</div><div class="val">${fittingHeight.toFixed(2)} mm</div></div>
+    </div>
+    <div class="output-cell">
+      <div class="lbl" style="margin-bottom:6px">Zone type → corridor choice</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div><div class="lbl">Bigger near zone</div><div class="val">${corr45} mm</div></div>
+        <div><div class="lbl">Balance zone</div><div class="val">${corr50} mm</div></div>
+        <div><div class="lbl">Bigger mid zone</div><div class="val">${corr55} mm</div></div>
+      </div>
+    </div>
   `;
 }
-</script>
 
+function plotGraph() {
+  const datasets = [];
+  if (eyeAccommodation !== null) {
+    const pts = [];
+    for (let d = 5; d <= 160; d++) { let add = 100/d - eyeAccommodation; if(add<0)add=0; if(add>5)add=5; pts.push({x:d,y:add}); }
+    datasets.push({label:'Minimal',data:pts,borderColor:'#888780',borderWidth:1.5,fill:false,pointRadius:0,tension:0.3});
+  }
+  if (eyeAccommodationB !== null) {
+    const pts = [];
+    for (let d = 5; d <= 160; d++) { let add = 100/d - eyeAccommodationB; if(add<0)add=0; if(add>5)add=5; pts.push({x:d,y:add}); }
+    datasets.push({label:'Balance',data:pts,borderColor:'#ef9f27',borderWidth:1.5,fill:false,pointRadius:0,tension:0.3});
+  }
+  const dotData = [];
+  for (let addVal = 0.5; addVal <= 5; addVal += 0.5) {
+    if (eyeAccommodation !== null) { let wd = 100/(eyeAccommodation+addVal); if(wd>=5&&wd<=70) dotData.push({x:wd,y:addVal}); }
+    if (eyeAccommodationB !== null) { let wdB = 100/(eyeAccommodationB+addVal); if(wdB>=5&&wdB<=70) dotData.push({x:wdB,y:addVal}); }
+  }
+  if (dotData.length) datasets.push({label:'Add',data:dotData,pointBackgroundColor:'#e24b4a',pointRadius:5,showLine:false});
+
+  const ctx = document.getElementById('addGraph').getContext('2d');
+  if (chart) chart.destroy();
+  const minX = parseFloat(document.getElementById('leftSlider').value);
+  const maxX = parseFloat(document.getElementById('rightSlider').value);
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {datasets},
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {labels: {font: {size: 12}, color: '#888'}},
+        tooltip: {callbacks: {
+          title: c => `WD: ${c[0].raw.x.toFixed(1)} cm`,
+          label: c => `${c[0].raw.y.toFixed(2)} D`
+        }}
+      },
+      scales: {
+        x: {type:'linear', title:{display:true,text:'Working distance (cm)',font:{size:11}}, min:minX, max:maxX, grid:{color:'rgba(0,0,0,0.05)'}},
+        y: {title:{display:true,text:'Add (D)',font:{size:11}}, min:0, max:3.5, grid:{color:'rgba(0,0,0,0.05)'}}
+      }
+    }
+  });
+}
+
+document.getElementById('leftSlider').addEventListener('input', e => {
+  document.getElementById('leftValue').textContent = e.target.value;
+  if (chart) { chart.options.scales.x.min = parseFloat(e.target.value); chart.update(); }
+});
+document.getElementById('rightSlider').addEventListener('input', e => {
+  document.getElementById('rightValue').textContent = e.target.value;
+  if (chart) { chart.options.scales.x.max = parseFloat(e.target.value); chart.update(); }
+});
+
+function calcBothWd1() {
+  if (eyeAccommodation !== null) calculateAdd('wd1', 'result1', eyeAccommodation);
+  if (eyeAccommodationB !== null) calculateAdd('wd1', 'result1b', eyeAccommodationB);
+
+  document.getElementById('btnWd1').classList.add('active');
+}
+
+function calcBothWd2() {
+  if (eyeAccommodation !== null) calculateAdd('wd2', 'result2', eyeAccommodation);
+  if (eyeAccommodationB !== null) calculateAdd('wd2', 'result2b', eyeAccommodationB);
+
+  document.getElementById('btnWd2').classList.add('active');
+}
+
+function calculate() {
+  // existing logic...
+
+  document.getElementById('btnMain').classList.add('active');
+}
+
+// WD1 depends on wd1 + accommodation inputs
+['wd1','add1','np1','add1b','np1b'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () =>
+    document.getElementById('btnWd1').classList.remove('active')
+  )
+);
+
+// WD2 depends on wd2 + accommodation inputs
+['wd2','add1','np1','add1b','np1b'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () =>
+    document.getElementById('btnWd2').classList.remove('active')
+  )
+);
+
+// Main calculator depends on these
+['pd','vd','ph','fit','wd1'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () =>
+    document.getElementById('btnMain').classList.remove('active')
+  )
+);
+
+
+['add1','np1'].forEach(id => document.getElementById(id).addEventListener('input', () => document.getElementById('btn1').classList.remove('active')));
+['add1b','np1b'].forEach(id => document.getElementById(id).addEventListener('input', () => document.getElementById('btn1b').classList.remove('active')));
+
+plotGraph();
+</script>
 </body>
 </html>
-
-
-
