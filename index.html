@@ -115,7 +115,34 @@
       <div class="result-val" id="res1bval">—</div>
     </div>
 </div>
+
+    <hr class="divider">
+
+    <h2>Near &amp; Mid Length</h2>
+    <p class="section-title">What is your preferred operating length</p>
+    <div class="two-col">
+      <div>
+        <div class="section-title"> </div>
+        <div class="row">
+          <div class="field"><label>Near Length (cm)</label><input value="30" type="number" step="1" id="wd1"></div>
+<button class="btn" id="btnWd1" onclick="calcBothWd1()">Calculate</button>
+        </div>
+        <div style="display:none" class="inline-result">Minimal add: <span id="result1">—</span></div>
+        <div class="inline-result">Balance add: <span id="result1b">—</span></div>
+      </div>
+      <div>
+        <div class="section-title"> </div>
+        <div class="row">
+          <div class="field"><label>Mid Length (cm)</label><input value="45" type="number" step="1" id="wd2"></div>
+<button class="btn" id="btnWd2" onclick="calcBothWd2()">Calculate</button>
+        </div>
+        <div style="display:none" class="inline-result">Minimal add: <span id="result2">—</span></div>
+        <div class="inline-result">Balance add: <span id="result2b">—</span></div>
+      </div>
+    </div>
+
   </div>
+
 
   <!-- INSET & CORRIDOR -->
   <div class="card">
@@ -133,28 +160,6 @@
       </div>
     </div>
 
-    <div class="two-col" style="margin-top:0.25rem">
-      <div>
-        <div class="section-title"> </div>
-        <div class="row">
-          <div class="field"><label>Near Length (cm)</label><input value="33" type="number" step="1" id="wd1"></div>
-<button class="btn" id="btnWd1" onclick="calcBothWd1()">Calculate</button>
-        </div>
-        <div style="display:none" class="inline-result">Minimal add: <span id="result1">—</span></div>
-        <div class="inline-result">Balance add: <span id="result1b">—</span></div>
-      </div>
-      <div>
-        <div class="section-title"> </div>
-        <div class="row">
-          <div class="field"><label>Mid Length (cm)</label><input value="45" type="number" step="1" id="wd2"></div>
-<button class="btn" id="btnWd2" onclick="calcBothWd2()">Calculate</button>
-        </div>
-        <div style="display:none" class="inline-result">Minimal add: <span id="result2">—</span></div>
-        <div class="inline-result">Balance add: <span id="result2b">—</span></div>
-      </div>
-    </div>
-
-    <hr class="divider">
 
     <button class="btn" id="btnMain" onclick="calculate()">Calculate inset &amp; corridor</button>
     <div id="output" style="margin-top:0.75rem"></div>
@@ -170,13 +175,13 @@
     <div id="graph-body" style="display:none">
       <div class="slider-row">
         <span style="min-width:80px">Min (cm)</span>
-        <input type="range" id="leftSlider" min="0" max="70" value="20" step="5">
-        <span id="leftValue" style="min-width:24px">20</span>
+        <input type="range" id="leftSlider" min="20" max="40" value="30" step="5">
+        <span id="leftValue" style="min-width:24px">30</span>
       </div>
       <div class="slider-row">
         <span style="min-width:80px">Max (cm)</span>
-        <input type="range" id="rightSlider" min="50" max="150" value="70" step="5">
-        <span id="rightValue" style="min-width:24px">70</span>
+        <input type="range" id="rightSlider" min="25" max="65" value="45" step="5">
+        <span id="rightValue" style="min-width:24px">45</span>
       </div>
       <canvas id="addGraph" style="margin-top:0.5rem;width:100%;max-height:320px"></canvas>
     </div>
@@ -311,11 +316,7 @@ function calculate() {
 
 function plotGraph() {
   const datasets = [];
-  if (eyeAccommodation !== null) {
-    const pts = [];
-    for (let d = 5; d <= 160; d++) { let add = 100/d - eyeAccommodation; if(add<0)add=0; if(add>5)add=5; pts.push({x:d,y:add}); }
-    datasets.push({label:'Minimal',data:pts,borderColor:'#888780',borderWidth:1.5,fill:false,pointRadius:0,tension:0.3});
-  }
+
   if (eyeAccommodationB !== null) {
     const pts = [];
     for (let d = 5; d <= 160; d++) { let add = 100/d - eyeAccommodationB; if(add<0)add=0; if(add>5)add=5; pts.push({x:d,y:add}); }
@@ -323,7 +324,7 @@ function plotGraph() {
   }
   const dotData = [];
   for (let addVal = 0.5; addVal <= 5; addVal += 0.5) {
-    if (eyeAccommodation !== null) { let wd = 100/(eyeAccommodation+addVal); if(wd>=5&&wd<=70) dotData.push({x:wd,y:addVal}); }
+
     if (eyeAccommodationB !== null) { let wdB = 100/(eyeAccommodationB+addVal); if(wdB>=5&&wdB<=70) dotData.push({x:wdB,y:addVal}); }
   }
   if (dotData.length) datasets.push({label:'Add',data:dotData,pointBackgroundColor:'#e24b4a',pointRadius:5,showLine:false});
