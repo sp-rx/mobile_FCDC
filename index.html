@@ -80,6 +80,7 @@
 
   <!-- MINIMAL & BALANCE ADD -->
   <div class="card">
+<div style="display:none" >
     <h2>Minimal add, Red Side Blur</h2>
     <p class="section-title" style="margin-bottom:0.75rem">Pull nearer and stop when RED side blurrier</p>
     <div class="row">
@@ -96,11 +97,11 @@
       <div class="result-val" id="res1val">—</div>
     </div>
 </div>
-
     <hr class="divider">
+</div>
 
-    <h2>Balance add, Both Side Clear (Must be further than above)</h2>
-    <p class="section-title" style="margin-bottom:0.75rem">From blur point, push away until both sides clear</p>
+    <h2>Measure nearest length that Both Side Clear</h2>
+    <p class="section-title" style="margin-bottom:0.75rem">Pull until it last point of clear.</p>
     <div class="row">
       <div class="field"><label>Add (D)</label><input value="1.50" type="number" step="0.25" id="add1b"></div>
       <div class="field"><label>Length (cm)</label><input value="33" type="number" step="1" id="np1b"></div>
@@ -118,7 +119,7 @@
 
     <hr class="divider">
 
-    <h2>Near &amp; Mid Length</h2>
+    <h2>Calculate Near &amp; Mid Length Add Requirement</h2>
     <p class="section-title">What is your preferred operating length</p>
     <div class="two-col">
       <div>
@@ -175,13 +176,13 @@
     <div id="graph-body" style="display:none">
       <div class="slider-row">
         <span style="min-width:80px">Min (cm)</span>
-        <input type="range" id="leftSlider" min="20" max="40" value="30" step="5">
-        <span id="leftValue" style="min-width:24px">30</span>
+        <input type="range" id="leftSlider" min="10" max="50" value="20" step="5">
+        <span id="leftValue" style="min-width:24px">20</span>
       </div>
       <div class="slider-row">
         <span style="min-width:80px">Max (cm)</span>
-        <input type="range" id="rightSlider" min="40" max="60" value="50" step="5">
-        <span id="rightValue" style="min-width:24px">50</span>
+        <input type="range" id="rightSlider" min="20" max="80" value="80" step="5">
+        <span id="rightValue" style="min-width:24px">80</span>
       </div>
       <canvas id="addGraph" style="margin-top:0.5rem;width:100%;max-height:320px"></canvas>
     </div>
@@ -317,37 +318,123 @@ function calculate() {
 function plotGraph() {
   const datasets = [];
 
+  // Balance line
+
+
+
+
   if (eyeAccommodationB !== null) {
-    const pts = [];
-    for (let d = 5; d <= 160; d++) { let add = 100/d - eyeAccommodationB; if(add<0)add=0; if(add>5)add=5; pts.push({x:d,y:add}); }
-    datasets.push({label:'Balance',data:pts,borderColor:'#ef9f27',borderWidth:1.5,fill:false,pointRadius:0,tension:0.3});
-  }
+
+
+  // ADD dots
   const dotData = [];
   for (let addVal = 0.5; addVal <= 5; addVal += 0.5) {
-
-    if (eyeAccommodationB !== null) { let wdB = 100/(eyeAccommodationB+addVal); if(wdB>=5&&wdB<=70) dotData.push({x:wdB,y:addVal}); }
+    if (eyeAccommodationB !== null) {
+      let wdB = 100 / (eyeAccommodationB + addVal);
+      if (wdB >= 5 && wdB <= 70) {
+        dotData.push({ x: wdB, y: addVal });
+      }
+    }
   }
-  if (dotData.length) datasets.push({label:'Add',data:dotData,pointBackgroundColor:'#e24b4a',pointRadius:5,showLine:false});
+
+  if (dotData.length) {
+    datasets.push({
+      label: 'Add',
+      data: dotData,
+      pointBackgroundColor: '#e24b4a',
+      pointRadius: 5,
+      showLine: false
+    });
+  }
+
+    const pts = [];
+    for (let d = 5; d <= 160; d++) {
+      let add = 100 / d - eyeAccommodationB;
+      if (add < 0) add = 0;
+      if (add > 5) add = 5;
+      pts.push({ x: d, y: add });
+    }
+
+    datasets.push({
+      label: 'Balance',
+      data: pts,
+      borderColor: '#ef9f27',
+      backgroundColor: 'white',
+      borderWidth: 1.5,
+      fill: true,
+      pointRadius: 0,
+      tension: 0.3
+    });
+  }
+
+  // Inverse line (cm → diopter)
+  const inversePts = [];
+  for (let cm = 5; cm <= 160; cm += 1) {
+    inversePts.push({
+      x: cm,
+      y: 100 / cm
+    });
+  }
+
+  datasets.push({
+    label: 'Max',
+    data: inversePts,
+    borderColor: 'white',
+  backgroundColor: 'rgba(239, 159, 39, 0.2)', // 👈 fill color
+
+    borderWidth: 1.5,
+    fill: true,
+    pointRadius: 0,
+    tension: 0
+  });
+
+
 
   const ctx = document.getElementById('addGraph').getContext('2d');
+
   if (chart) chart.destroy();
+
   const minX = parseFloat(document.getElementById('leftSlider').value);
   const maxX = parseFloat(document.getElementById('rightSlider').value);
+
   chart = new Chart(ctx, {
     type: 'line',
-    data: {datasets},
+    data: { datasets },
     options: {
       responsive: true,
       plugins: {
-        legend: {labels: {font: {size: 12}, color: '#888'}},
-        tooltip: {callbacks: {
-          title: c => `WD: ${c[0].raw.x.toFixed(1)} cm`,
-          label: c => `${c[0].raw.y.toFixed(2)} D`
-        }}
+        legend: {
+          labels: { font: { size: 12 }, color: '#888' }
+        },
+        tooltip: {
+          callbacks: {
+            title: c => `WD: ${c[0].raw.x.toFixed(1)} cm`,
+            label: c => `Value: ${c[0].raw.y.toFixed(2)}`
+          }
+        }
       },
       scales: {
-        x: {type:'linear', title:{display:true,text:'Working distance (cm)',font:{size:11}}, min:minX, max:maxX, grid:{color:'rgba(0,0,0,0.05)'}},
-        y: {title:{display:true,text:'Add (D)',font:{size:11}}, min:0, max:3.5, grid:{color:'rgba(0,0,0,0.05)'}}
+        x: {
+          type: 'linear',
+          title: {
+            display: true,
+            text: 'Working distance (cm)',
+            font: { size: 11 }
+          },
+          min: minX,
+          max: maxX,
+          grid: { color: 'rgba(0,0,0,0.3)' }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Value',
+            font: { size: 11 }
+          },
+          min: 0,
+          max: 5,
+          grid: { color: 'rgba(255,0,0,1)' }
+        }
       }
     }
   });
@@ -355,15 +442,31 @@ function plotGraph() {
 
 document.getElementById('leftSlider').addEventListener('input', e => {
   document.getElementById('leftValue').textContent = e.target.value;
-  if (chart) { chart.options.scales.x.min = parseFloat(e.target.value); chart.update(); }
-});
-document.getElementById('rightSlider').addEventListener('input', e => {
-  document.getElementById('rightValue').textContent = e.target.value;
-  if (chart) { chart.options.scales.x.max = parseFloat(e.target.value); chart.update(); }
+  if (chart) {
+    chart.options.scales.x.min = parseFloat(e.target.value);
+    chart.update();
+  }
 });
 
-['add1','np1'].forEach(id => document.getElementById(id).addEventListener('input', () => document.getElementById('btn1').classList.remove('active')));
-['add1b','np1b'].forEach(id => document.getElementById(id).addEventListener('input', () => document.getElementById('btn1b').classList.remove('active')));
+document.getElementById('rightSlider').addEventListener('input', e => {
+  document.getElementById('rightValue').textContent = e.target.value;
+  if (chart) {
+    chart.options.scales.x.max = parseFloat(e.target.value);
+    chart.update();
+  }
+});
+
+['add1', 'np1'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () =>
+    document.getElementById('btn1').classList.remove('active')
+  )
+);
+
+['add1b', 'np1b'].forEach(id =>
+  document.getElementById(id).addEventListener('input', () =>
+    document.getElementById('btn1b').classList.remove('active')
+  )
+);
 
 plotGraph();
 
