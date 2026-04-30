@@ -170,18 +170,18 @@
   <!-- WORKING DISTANCE GRAPH -->
   <div class="card">
     <div class="card-header">
-      <h2 style="margin:0">Working distance graph</h2>
+      <h2 style="margin:0">Prescription Range of Vision</h2>
       <button class="toggle-btn" onclick="toggle('graph-body')">Show / Hide</button>
     </div>
     <div id="graph-body" style="display:none">
       <div class="slider-row">
-        <span style="min-width:80px">Min (cm)</span>
-        <input type="range" id="leftSlider" min="10" max="50" value="20" step="5">
-        <span id="leftValue" style="min-width:24px">20</span>
+        <span style="min-width:80px">Near (cm)</span>
+        <input type="range" id="leftSlider" min="10" max="60" value="30" step="5">
+        <span id="leftValue" style="min-width:24px">30</span>
       </div>
       <div class="slider-row">
-        <span style="min-width:80px">Max (cm)</span>
-        <input type="range" id="rightSlider" min="20" max="80" value="80" step="5">
+        <span style="min-width:80px">Mid (cm)</span>
+        <input type="range" id="rightSlider" min="20" max="170" value="80" step="5">
         <span id="rightValue" style="min-width:24px">80</span>
       </div>
       <canvas id="addGraph" style="margin-top:0.5rem;width:100%;max-height:320px"></canvas>
@@ -342,7 +342,7 @@ function plotGraph() {
       label: 'Add',
       data: dotData,
       pointBackgroundColor: '#e24b4a',
-      pointRadius: 5,
+      pointRadius: 0,
       showLine: false
     });
   }
@@ -359,9 +359,8 @@ function plotGraph() {
       label: 'Balance',
       data: pts,
       borderColor: '#ef9f27',
-      backgroundColor: 'white',
-      borderWidth: 1.5,
-      fill: true,
+      borderWidth: 0,
+      fill: false,
       pointRadius: 0,
       tension: 0.3
     });
@@ -379,15 +378,59 @@ function plotGraph() {
   datasets.push({
     label: 'Max',
     data: inversePts,
-    borderColor: 'white',
-  backgroundColor: 'rgba(239, 159, 39, 0.2)', // 👈 fill color
-
-    borderWidth: 1.5,
-    fill: true,
+    borderColor: '#ef9f27',
+    borderWidth: 0,
+    fill: false,
     pointRadius: 0,
     tension: 0
   });
 
+// Inverse dots (every 0.5D)
+const inverseDots = [];
+for (let d = 0.5; d <= 5; d += 0.5) {
+let cm = (100 / d) * 0.9;
+  if (cm >= 5 && cm <= 300) {
+    inverseDots.push({ x: cm, y: d });
+  }
+}
+
+datasets.push({
+  label: 'Max dots',
+  data: inverseDots,
+  pointBackgroundColor: '#e24b4a',
+  pointRadius: 0,
+  showLine: false
+});
+
+// Horizontal connectors (same add plane)
+const hLines = [];
+
+for (let d = 0.5; d <= 5; d += 0.5) {
+  const xMax = (100 / d) * 0.9; // inverse line
+
+  // balance line intersection (only if available)
+  if (eyeAccommodationB !== null) {
+    const xBal = 100 / (eyeAccommodationB + d);
+
+    if (xBal >= 5 && xBal <= 160 && xMax >= 5 && xMax <= 300) {
+      hLines.push({
+        label: 'plane',
+        data: [
+          { x: xBal, y: d },
+          { x: xMax, y: d }
+        ],
+        borderColor: '#f6c27a',
+        borderWidth: 10,
+        pointRadius: 0,
+        fill: false,
+        tension: 0
+      });
+    }
+  }
+}
+
+// push all horizontal lines
+datasets.push(...hLines);
 
 
   const ctx = document.getElementById('addGraph').getContext('2d');
@@ -402,29 +445,32 @@ function plotGraph() {
     data: { datasets },
     options: {
       responsive: true,
-      plugins: {
-        legend: {
-          labels: { font: { size: 12 }, color: '#888' }
-        },
-        tooltip: {
-          callbacks: {
-            title: c => `WD: ${c[0].raw.x.toFixed(1)} cm`,
-            label: c => `Value: ${c[0].raw.y.toFixed(2)}`
-          }
-        }
-      },
+plugins: {
+  legend: {
+    display: false
+  },
+  tooltip: {
+    callbacks: {
+      title: c => `WD: ${c[0].raw.x.toFixed(1)} cm`,
+      label: c => `Value: ${c[0].raw.y.toFixed(2)}`
+    }
+  }
+},
       scales: {
-        x: {
-          type: 'linear',
-          title: {
-            display: true,
-            text: 'Working distance (cm)',
-            font: { size: 11 }
-          },
-          min: minX,
-          max: maxX,
-          grid: { color: 'rgba(0,0,0,0.3)' }
-        },
+x: {
+  type: 'linear',
+  title: {
+    display: true,
+    text: 'Working distance (cm)',
+    font: { size: 11 }
+  },
+  min: minX,
+  max: maxX,
+  ticks: {
+    stepSize: 5   // ← THIS is what you’re missing
+  },
+  grid: { color: 'rgba(0,0,0,0.3)' }
+},
         y: {
           title: {
             display: true,
@@ -432,8 +478,8 @@ function plotGraph() {
             font: { size: 11 }
           },
           min: 0,
-          max: 5,
-          grid: { color: 'rgba(255,0,0,1)' }
+          max: 4,
+          grid: { color: 'rgba(0,0,0,0.05)' }
         }
       }
     }
