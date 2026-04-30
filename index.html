@@ -291,7 +291,7 @@ function calculate() {
     return;
   }
   const wd = wd_cm * 10;
-  const inset = (pd / 2) - (wd * (pd / 2) / (wd + vd));
+  const inset = ((pd / 2) - (wd * (pd / 2) / (wd + vd))) * 2;
   const fittingHeight = ph - offset;
   function corridor(angle) { return vd * Math.tan(angle * Math.PI / 180); }
   const corr45 = roundCorridor(corridor(45) - offset - 3);
