@@ -301,7 +301,7 @@ function corridorAddAdjustment(realCorridor, baseAdd) {
   if (realCorridor >= 9) return 0;
 
   const deficit = 9 - realCorridor;
-  const addPercent = deficit * 20;
+  const addPercent = deficit * 10;
 
   const extraAdd = baseAdd * (addPercent / 100);
 
