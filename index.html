@@ -32,7 +32,7 @@
 .duo-side {
   position: relative;
   width: 300px;
-  height: 550px;
+  height: 650px;
 
   display: flex;
   align-items: center;
@@ -121,9 +121,9 @@
   background:#c1c1c1;
   border:1px solid var(--line);
   border-radius:50px;
-  padding:30px 20px 40px 20px;
+  padding:30px 0px 40px 0px;
   margin:0px 0;
-  width:95%;
+  width:700px;
 }
   #container {
     display: flex;
@@ -131,11 +131,6 @@
     gap: 20px;
   }
 
-  #left-controls, #right-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
 
   #cylVal { font-weight: bold; margin-left:5px; }
 
@@ -244,15 +239,18 @@
 
 
 <tr>
-<td align="center" style="text-align:center;">
+<td>
 
-  <div style="margin-top:250px"></div>
 
 
 
 <div style="text-align:center; margin-top:500px; margin-bottom:0px">
 <span style="font-size:25px"><b>Kiara Optometry Near FC DC</b></span>
 
+
+</td></tr>
+
+<tr><td>
 <div style="display:none">
 
 <div style="height:60px"></div>
@@ -311,7 +309,12 @@
 </div>
 </td></tr>
 
+</table>
 
+</div>
+
+
+<table>
 
 
 
@@ -325,11 +328,11 @@
 
 
 
-  <span><b>Sphere Analysis & Explanation</b></span>
+  <span><b>Current Sphere & Delta</b></span>
 <div style="margin-top:20px">
 
 </div>
-<div style="background-color:white; width:90%; border-radius:50px; margin:0 auto;"><div class="duo-wrap rx-block">
+<div style="background-color:white; width:80%; border-radius:50px; margin:0 auto;"><div class="duo-wrap rx-block">
   <div class="duochrome">
 
     <div class="duo-side">
@@ -478,14 +481,16 @@ recompute();
 
 <div style="height:10px"></div>
 
-  <div style="width:100%; max-width:870px; margin:0 auto;">
+  <div style="width:95%; margin:0 auto;">
       <img src="https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/DCSCALE.jpg"
            style="width:100%; display:block; border-radius:30px;">
   </div>
 
-  <!-- TICKS -->
+
+<div style="width:80%; margin:0 auto;">
+ <!-- TICKS -->
   <div id="tickRow"
-       style="display:flex; justify-content:space-between; margin-top:-120px">
+       style="display:flex; justify-content:space-between; margin-top:-95px">
   </div>
 
   <!-- NUMBERS -->
@@ -499,8 +504,9 @@ recompute();
   </div>
 
 </div>
+</div>
 
-<div style="height:80px"></div>
+<div style="height:20px"></div>
 
 
 
@@ -643,97 +649,66 @@ refreshScale();
 
 
 </table>
-</div>
 
 
 
 <table>
 
 
-
-
-
-
-
 <tr>
 <td align="center" style="text-align:center;">
-
 <div class="section" style="margin-top:100px">
 
   <div id="page-wrapper">
 
+    <span><b>Astigmatism Delta</b></span>
+    <div style="margin-top:10px"></div>
 
-<span style="font-size:25px"><b>Astigmatism Deficit</b></span>
-<div style="margin-top:10px"></div>
-
-
-<div class="toggle-button" onclick="toggleDiv(this)">Show / Hide</div>
-
-<div class="toggle-content">
-
-
-<div style="margin-top:20px" id="header">
-<span><b>Adjust the darkness and direction of the lines according to what you see.</b></span>
-</div>
-<div style="margin-top:5px" id="header">
-
-  <span style="font-size:25px"><b>CYL Value Correction<span style="color:darkred" id="cylVal">0.00</span></b></span>
-</div>
-
-
-<div style="margin-top:20px" id="header">
-
-<button class="reso-btn" onclick="setMode('pc', this)">Normal Reso</button> 
-<button class="reso-btn" onclick="setMode('ipad', this)">Higher Reso </button> 
-<button id="fogBtn" onclick="toggleFogging()">No Blur</button>
-
-
-</div>
-
-
-<div id="container">
-  <div id="left-controls">
-
-
-    <div>
-      <b>Line</b><br>
-      <button onclick="changeCyl(-0.25)">Lighter</button>
-      <button style="height:30px" onclick="rotateFan(-90)">Flip</button><br>
-
+    <div style="display:none;" class="toggle-button" onclick="toggleDiv(this)">
+      Show / Hide
     </div>
-    <div>
-      <b>Rotate</b><br>
-      <button onclick="rotateFan(-45)"><<<</button><br>
-      <button onclick="rotateFan(-15)"><<</button><br>
-      <button onclick="rotateFan(-7.5)"><</button>
-    </div>
-  </div>
 
-  <!-- Fan wrapper -->
+    <div class="toggle-content">
 
-  <div id="fan-wrapper">
 
-    <canvas id="fan-container"></canvas>
-  </div>
 
-  <div id="right-controls">
+      <div style="display:none; margin-top:20px" class="header">
+        <button class="reso-btn" onclick="setMode('pc', this)">Normal Reso</button>
+        <button class="reso-btn" onclick="setMode('ipad', this)">Higher Reso</button>
+        <button id="fogBtn" onclick="toggleFogging()">No Blur</button>
+      </div>
 
-<div>
-     <b>Line</b><br>
-      <button onclick="changeCyl(0.25)">Darker</button>
-      <button style="height:30px" onclick="rotateFan(90)">Flip</button><br>
+      <div id="container">
 
-    </div>
-    <div>
-      <b>Rotate</b><br>
-      <button onclick="rotateFan(45)">>>></button><br>
-      <button onclick="rotateFan(15)">>></button><br>
-      <button onclick="rotateFan(7.5)">></button>
-    </div>
-  </div>
+        <div id="left-controls">
+          <div>
+            <b>Line</b>
+            <button style="margin-left:20px" onclick="changeCyl(-0.25)">Darken</button>
+            <button onclick="changeCyl(0.25)">Lighten</button>
+            <button style="margin-left:20px" onclick="rotateFan(-15)"><<</button>
+            <button onclick="rotateFan(15)">>></button>
+
+
+          </div>
+<div style="margin-top:10px">
+ <span ><b>CYL Value <span style="color:darkred" id="cylVal">0.00</span></b> </span>
 </div>
+          <div style="margin-top:10px" id="fan-wrapper">
 
-</div>
+
+            <canvas id="fan-container"></canvas>
+          </div>
+
+        </div> <!-- left-controls -->
+
+      </div> <!-- container -->
+
+    </div> <!-- toggle-content -->
+
+  </div> <!-- page-wrapper -->
+
+</div> <!-- section -->
+
 
 </td></tr>
 
@@ -747,7 +722,7 @@ refreshScale();
 
 <tr><td>
 
-<div class="section" style="margin-top:20px">
+<div class="section" style="display:none; margin-top:20px">
 
 <div style="text-align:center; margin-bottom:15px;">
 <div>
@@ -956,7 +931,6 @@ drawAstig();
 </div>
 
 <tr style="height:500px"><td>
-</td></tr>
 </table>
 
 
@@ -1055,7 +1029,7 @@ function updateCylDisplay() {
   const description = clockMap[step];
 
 const powerPart = `- ${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
-const fullText = `${powerPart} (${description} deficit)`;
+const fullText = `${powerPart} (${description} Delta)`;
 
 // Original (with description)
 cylVal.innerHTML = fullText;
