@@ -691,7 +691,7 @@ refreshScale();
 
           </div>
 <div style="margin-top:10px">
- <span ><b>CYL Value <span style="color:darkred" id="cylVal">0.00</span></b> </span>
+ <span ><b>CYL Value <span style="color:darkgreen" id="cylVal">0.00</span></b> </span>
 </div>
           <div style="margin-top:10px" id="fan-wrapper">
 
@@ -1028,8 +1028,20 @@ function updateCylDisplay() {
 
   const description = clockMap[step];
 
-const powerPart = `- ${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
-const fullText = `${powerPart} (${description} Delta)`;
+const powerPart = `+${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
+
+let minusAxis = axis + 90;
+if (minusAxis > 180) minusAxis -= 180;
+
+const minusPowerPart = `-${cylBlur.toFixed(2)} × ${minusAxis.toString().padStart(3,'0')}`;
+
+const fullText = `
+    <span style="color:#404040;">${description} Delta</span>
+<br><br>
+  <span style="color:darkgreen;">${powerPart}</span>
+  <span style="color:#404040;">&nbsp;&nbsp;or&nbsp;&nbsp;</span>
+  <span style="color:darkred;">${minusPowerPart}</span>
+`;
 
 // Original (with description)
 cylVal.innerHTML = fullText;
