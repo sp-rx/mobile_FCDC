@@ -191,7 +191,7 @@
 #page-wrapper {
   display: inline-flex;   /* key */
   justify-content: center;    
-  max-width: 100%;
+  width: 100%;
   flex-direction: column;
   align-items: center;
 }
@@ -232,6 +232,8 @@
 
 
 <body>
+
+
 
 <div style="max-width:90%; margin-top:2000px">
 
@@ -351,61 +353,6 @@
 
 </div>
 
-
-
-<div style="height:20px"></div>
-
-
-
-
-<div style="text-align:center; margin:0px auto 0 auto; font-family:arial; width:95%;">
-
-  <div style="display:flex; gap:15px; align-items:center; justify-content:center;">
-
-    <div style="display:none">
-      <input style="text-align:center; width:50%; height:30px; border-radius:6px" type="number" id="deltaInput" step="0.25" value="0.00">
-      <button style="height:40px" onclick="refreshScale()">To balance</button>
-    </div>
-  </div>
-
-<div style="height:10px"></div>
-
-  <div style="width:95%; margin:0 auto;">
-      <img src="https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/DCSCALE.jpg"
-           style="width:100%; display:block; border-radius:30px;">
-  </div>
-
-
-<div style="width:80%; margin:0 auto;">
- <!-- TICKS -->
-  <div id="tickRow"
-       style="display:flex; justify-content:space-between; margin-top:-95px">
-  </div>
-
-  <!-- NUMBERS -->
-  <div id="numberRow"
-       style="display:flex; justify-content:space-between; margin-top:5px; font-size:13px;">
-  </div>
-
-  <!-- CURRENT ARROW -->
-  <div id="arrowRow"
-       style="display:flex; justify-content:space-between; margin-top:5px; height:40px; font-size:13px;">
-  </div>
-
-</div>
-</div>
-
-<div>
-  Current Sph <input  style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
-    type="number"
-    id="balanceInput"
-    step="0.25"
-    value="-0.00"
-    oninput="refreshScale()"
-  >
-  <button type="button" onclick="adjustBalance(-0.25)">-</button>
-  <button type="button" onclick="adjustBalance(0.25)">+</button>
-
 <div>
 Delta Value<input  style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
   type="text"
@@ -430,14 +377,36 @@ function syncDelta(el){
   <button onclick="adj('sph_test', -0.25)">-</button>
   <button onclick="adj('sph_test',  0.25)">+</button>
 
+
+  </div>
 <div>
 
- 
+  Current Sph <input  style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
+    type="number"
+    id="balanceInput"
+    step="0.25"
+    value="-0.00"
+    oninput="refreshScale()"
+  >
+  <button type="button" onclick="adjustBalance(-0.25)">-</button>
+  <button type="button" onclick="adjustBalance(0.25)">+</button>
 
   <button style="display:none; height:40px" onclick="refreshScale()">Current</button>
 
 
+<script>
+function adjustBalance(step){
+  const el = document.getElementById("balanceInput");
 
+  let v = parseFloat(el.value);
+  if (isNaN(v)) v = 0;
+
+  v = Math.round((v + step) * 4) / 4; // keep 0.25 steps
+
+  el.value = v.toFixed(2);
+
+  refreshScale();
+}</script>
     </div>
 
 <script>
@@ -497,7 +466,46 @@ recompute();
 </script>
 
 
+<div style="height:20px"></div>
+
+
+
+
+<div style="text-align:center; margin:0px auto 0 auto; font-family:arial; width:95%;">
+
+  <div style="display:flex; gap:15px; align-items:center; justify-content:center;">
+
+    <div style="display:none">
+      <input style="text-align:center; width:50%; height:30px; border-radius:6px" type="number" id="deltaInput" step="0.25" value="0.00">
+      <button style="height:40px" onclick="refreshScale()">To balance</button>
+    </div>
   </div>
+
+<div style="height:10px"></div>
+
+  <div style="width:95%; margin:0 auto;">
+      <img src="https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/DCSCALE.jpg"
+           style="width:100%; display:block; border-radius:30px;">
+  </div>
+
+
+<div style="width:80%; margin:0 auto;">
+ <!-- TICKS -->
+  <div id="tickRow"
+       style="display:flex; justify-content:space-between; margin-top:-95px">
+  </div>
+
+  <!-- NUMBERS -->
+  <div id="numberRow"
+       style="display:flex; justify-content:space-between; margin-top:5px; font-size:13px;">
+  </div>
+
+  <!-- CURRENT ARROW -->
+  <div id="arrowRow"
+       style="display:flex; justify-content:space-between; margin-top:5px; height:40px; font-size:13px;">
+  </div>
+
+</div>
 </div>
 
 <div style="height:20px"></div>
@@ -1224,19 +1232,6 @@ function toggleDiv(btn) {
 
 
 
-<script>
-function adjustBalance(step){
-  const el = document.getElementById("balanceInput");
-
-  let v = parseFloat(el.value);
-  if (isNaN(v)) v = 0;
-
-  v = Math.round((v + step) * 4) / 4; // keep 0.25 steps
-
-  el.value = v.toFixed(2);
-
-  refreshScale();
-}</script>
 
 
 
@@ -1245,8 +1240,7 @@ function adjustBalance(step){
 
 
 
-
-
+</div>
 
 
 
