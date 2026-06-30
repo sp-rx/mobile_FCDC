@@ -370,7 +370,7 @@ function syncDelta(el){
   const deltaInput = document.getElementById("deltaInput");
   deltaInput.value = delta.toFixed(2);
 
-  refreshScale(); // fires the same logic as your button
+refreshScale(true); // fires the same logic as your button
 }</script>
 
 
@@ -382,11 +382,12 @@ function syncDelta(el){
 <div>
 
   Current Sph <input  style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
-    type="number"
+    type="text"
     id="balanceInput"
     step="0.25"
     value="-0.00"
-    oninput="refreshScale()"
+    oninput="refreshScale(false)"
+    onblur="refreshScale(true)"
   >
   <button type="button" onclick="adjustBalance(-0.25)">-</button>
   <button type="button" onclick="adjustBalance(0.25)">+</button>
@@ -405,7 +406,7 @@ function adjustBalance(step){
 
   el.value = v.toFixed(2);
 
-  refreshScale();
+refreshScale(true);
 }</script>
     </div>
 
@@ -532,10 +533,12 @@ function formatPower(v) {
 }
 
 // SINGLE FUNCTION TO UPDATE EVERYTHING
-function refreshScale() {
+function refreshScale(doSnap = false) {
 
-    snap(document.getElementById("balanceInput"));
-    snap(document.getElementById("deltaInput"));
+    if (doSnap) {
+        snap(document.getElementById("balanceInput"));
+        snap(document.getElementById("deltaInput"));
+    }
 
     const current = parseFloat(document.getElementById("balanceInput").value);
     const delta = parseFloat(document.getElementById("deltaInput").value);
@@ -638,7 +641,7 @@ function refreshScale() {
     }
 }
 
-refreshScale();
+refreshScale(true);
 </script>
 
 
@@ -692,7 +695,7 @@ refreshScale();
 
 
           </div>
-<div style="margin-top:10px">
+<div style="margin-top:15px;">
  <span ><b>CYL Value <span style="color:darkblue" id="cylVal">0.00</span></b> </span>
 </div>
           <div style="margin-top:10px" id="fan-wrapper">
@@ -1039,9 +1042,9 @@ const minusPowerPart = `-${cylBlur.toFixed(2)} × ${minusAxis.toString().padStar
 
 const fullText = `
     <span style="color:#404040;">${description} Delta</span>
-<br><br>
-  <span style="color:#1C5561;">${powerPart}</span>
-  <span style="color:#404040;">&nbsp;&nbsp;or&nbsp;&nbsp;</span>
+<br>
+  <span style="display:none; color:#1C5561;">${powerPart}</span>
+  <span style="display:none; color:#404040;">&nbsp;&nbsp;or&nbsp;&nbsp;</span>
   <span style="color:darkred;">${minusPowerPart}</span>
 `;
 
