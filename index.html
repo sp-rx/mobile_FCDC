@@ -1179,8 +1179,8 @@ for (let i = 0; i < totalShades; i++) {
   const spreadFraction = Math.abs(i - (totalShades - 1) / 2) / ((totalShades - 1) / 2);
 
   // line width decreases from center to edges
-  const maxLineWidth = 2.0;
-  const minLineWidth = 3.0;
+const maxLineWidth = cw * 0.004;
+const minLineWidth = cw * 0.006;
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
   const baseColor = 0;
@@ -1211,7 +1211,8 @@ for (let i = 0; i < totalShades; i++) {
     ctx.rotate((a + angle + 90) * Math.PI / 180);
 
     ctx.beginPath();
-    ctx.arc(0, -dotOffset, 4, 0, Math.PI * 2);
+const dotRadius = cw * 0.008;
+ctx.arc(0, -dotOffset, dotRadius, 0, Math.PI * 2);
     ctx.fillStyle = 'darkred';
     ctx.fill();
 
