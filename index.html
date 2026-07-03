@@ -7,15 +7,7 @@
 <title>Duochrome and Fan Chart Visualizer</title>
 <style>
 
-#app{
-  transform-origin: top center;
-}
 
-@media (max-width: 480px){
-  #app{
-    transform: scale(0.5);
-  }
-}
 
   body {
     display: flex;
@@ -29,6 +21,20 @@
     justify-content: center;
     background: lightgrey;
   }
+
+@media (max-width: 480px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    justify-content: flex-start;
+    padding-top: 20px; /* optional */
+  }
+
+  #app {
+    transform: scale(0.5);
+    transform-origin: top center;
+  }
+}
 
 .duochrome {
   display: flex;
@@ -241,9 +247,9 @@
 </style>
 </head>
 
-<div id="app">
 
 <body>
+<div id="app">
 
 
 <div style="max-width:90%; margin-top:2000px">
@@ -1257,9 +1263,9 @@ function toggleDiv(btn) {
 </div>
 
 
+</div>
 
 </body>
-</div>
 
 
 </html>
