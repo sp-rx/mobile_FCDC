@@ -7,7 +7,6 @@
 <style>
 
 
-  
 
   body {
     display: flex;
@@ -1049,19 +1048,19 @@ function updateCylDisplay() {
 
   const description = clockMap[step];
 
-const powerPart = `+${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
+const powerPart = `-${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
 
 let minusAxis = axis + 90;
 if (minusAxis > 180) minusAxis -= 180;
 
-const minusPowerPart = `-${cylBlur.toFixed(2)} × ${minusAxis.toString().padStart(3,'0')}`;
+const minusPowerPart = `+${cylBlur.toFixed(2)} × ${minusAxis.toString().padStart(3,'0')}`;
 
 const fullText = `
     <span style="color:#404040;">${description} Delta</span>
 <br>
-  <span style="display:none; color:#1C5561;">${powerPart}</span>
-  <span style="display:none; color:#404040;">&nbsp;&nbsp;or&nbsp;&nbsp;</span>
-  <span style="color:darkred;">${minusPowerPart}</span>
+  <span style="color:darkred;">${powerPart}</span>
+  <span style="color:#404040;">&nbsp;&nbsp;or&nbsp;&nbsp;</span>
+  <span style="color:#1C5561;">${minusPowerPart}</span>
 `;
 
 // Original (with description)
@@ -1220,6 +1219,21 @@ ctx.arc(0, -dotOffset, dotRadius, 0, Math.PI * 2);
 
     ctx.restore();
   });
+
+/* Green opposite axis dots */
+[90, 270].forEach(a => {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate((a + angle + 90) * Math.PI / 180);
+
+  ctx.beginPath();
+  const dotRadius = cw * 0.008;
+  ctx.arc(0, -dotOffset, dotRadius, 0, Math.PI * 2);
+  ctx.fillStyle = '#1C5561';
+  ctx.fill();
+
+  ctx.restore();
+});
 
   /* Center white circle */
   ctx.beginPath();
