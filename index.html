@@ -192,6 +192,21 @@
   border-radius: 50px;          
 }
 
+#fan-wrapper-bal {
+  display: inline-flex;   /* key */
+  width: 520px;
+  height: 450px;
+  background-image: url("https://sp-rx.github.io/trainer_light/FCBG_BAL.jpg");
+  background-size: cover;       
+  background-position: center;  
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  justify-content: center;     
+  align-items: center;         
+  overflow: hidden;            
+  border-radius: 50px;          
+}
 
 #fan-container {
   width: 480px;       /* fan smaller than wrapper */
@@ -240,6 +255,19 @@
 
   }
 
+.hidden {
+  display: none !important;
+}
+
+#balancedButton.active {
+  background-color: #d9d9d9;
+  color: black;
+}
+
+#balancedButtonFC.active {
+  background-color: #d9d9d9;
+  color: black;
+}
 
 </style>
 </head>
@@ -345,19 +373,77 @@
 
 
 
-  <span><b>Current Sphere & Delta</b></span>
-<div style="margin-top:20px">
+  <span><b>Sphere Delta</b></span>
+<div style="margin-top:2%">
+</div>
+
+<button
+  id="balancedButton"
+  type="button"
+  style="height:30px; width:40%;"
+  onclick="toggleBalancedDuo()"
+>
+  Show / Hide Example of Balanced Duochrome
+</button>
+
+<script>
+function toggleBalancedDuo() {
+  const balancedDuo = document.querySelector(".balanceduo");
+  const button = document.querySelector("#balancedButton");
+
+  const isHidden = getComputedStyle(balancedDuo).display === "none";
+
+  if (isHidden) {
+    balancedDuo.style.display = "block";
+    button.classList.add("active");
+  } else {
+    balancedDuo.style.display = "none";
+    button.classList.remove("active");
+  }
+}
+</script>
+
+
+<div class="balanceduo" style="display:none; background-color:#fff; height:420px; width:90%; border-radius:50px; margin:2% auto;">
+
+<div class="duo-wrap rx-block">
+<br>
+<span><b>Example of A Balanced Duochrome</b></span>
+
+  <div class="duochrome">
+    <div style="margin-top:-195px;" class="duo-side">
+      <img src="https://sp-rx.github.io/Trainer/RED_1.png">
+    </div>
+
+    <div style="margin-top:-195px;" class="duo-side">
+      <img src="https://sp-rx.github.io/Trainer/BLUE_1.png">
+    </div>
 
 </div>
-<div style="background-color:white; height:390px; width:90%; border-radius:50px; margin:0 auto;"><div class="duo-wrap rx-block">
+</div>
+
+
+</div>
+
+
+
+
+
+<div style="background-color:white; height:420px; width:90%; border-radius:50px; margin:2% auto;">
+
+
+<div class="duo-wrap rx-block">
+<br>
+<span><b>Your Current Duochrome</b></span>
+
   <div class="duochrome">
 
-    <div style="margin-top:-175px;" class="duo-side">
+    <div style="margin-top:-195px;" class="duo-side">
       <img id="redImg"
            src="https://sp-rx.github.io/Trainer/RED_1.png">
     </div>
 
-    <div style="margin-top:-175px;" class="duo-side">
+    <div style="margin-top:-195px;" class="duo-side">
       <img id="blueImg"
            src="https://sp-rx.github.io/Trainer/BLUE_1.png">
     </div>
@@ -368,7 +454,11 @@
 
 </div>
 
+
+<div style="background-color:white; height:130px; width:90%; border-radius:30px; margin:1% auto;">
+
 <div>
+
 Delta Value<input  style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
   type="text"
   id="sph_test"
@@ -396,7 +486,7 @@ refreshScale(true); // fires the same logic as your button
   </div>
 <div>
 
-  Current Sph <input  style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
+  Current Sph <input style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
     type="text"
     id="balanceInput"
     step="0.25"
@@ -423,8 +513,9 @@ function adjustBalance(step){
 
 refreshScale(true);
 }</script>
-    </div>
 
+
+</div>
 <script>
 /* ========= BUTTON ADJ ========= */
 window.adj = function(type, step){
@@ -482,7 +573,9 @@ recompute();
 </script>
 
 
-<div style="height:20px"></div>
+
+</div>
+
 
 
 
@@ -682,6 +775,63 @@ refreshScale(true);
   <div id="page-wrapper">
 
     <span><b>Astigmatism Delta</b></span>
+<br>
+<button 
+  id="balancedButtonFC"
+  type="button"
+  style="height:30px; width:50%;"
+  onclick="toggleBalancedFC()"
+>
+  Show / Hide Example of Balanced Astigmatism Chart
+</button>
+
+<script>
+function toggleBalancedFC() {
+  const balancedFC = document.querySelector(".balancedFC");
+  const button = document.querySelector("#balancedButtonFC");
+
+  const isHidden = getComputedStyle(balancedFC).display === "none";
+
+  if (isHidden) {
+    balancedFC.style.display = "flex";
+    button.classList.add("active");
+  } else {
+    balancedFC.style.display = "none";
+    button.classList.remove("active");
+  }
+}
+</script>
+
+
+
+
+<div 
+  class="balancedFC" 
+  style="display:none; background-color:#ebebeb; width:90%; border-radius:50px; margin:1% auto; flex-direction:column; justify-content:center; align-items:center;"
+>
+
+
+<div><span><br><b>Example of a Balanced Astigmatism Chart</b></span></div>
+
+          <div style="margin-top:10px" id="fan-wrapper-bal">
+            <canvas id="fan-container-balance"></canvas>
+          </div>
+</div>
+
+
+<div style="background-color:#ebebeb; width:90%; border-radius:50px; margin:1% auto; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+
+
+<div><span><br><b>Your Current Astigmatism Chart</b></span></div>
+
+          <div style="margin-top:10px" id="fan-wrapper">
+
+
+            <canvas id="fan-container"></canvas>
+          </div>
+
+</div>
+
     <div style="margin-top:10px"></div>
 
     <div style="display:none;" class="toggle-button" onclick="toggleDiv(this)">
@@ -702,7 +852,10 @@ refreshScale(true);
 
         <div id="left-controls">
           <div>
-            <b>Line</b>
+<span style="color:darkred; font-size:18px;">●</span>
+<b style="margin:0 8px;">Line</b>
+<span style="color:darkred; font-size:18px;">●</span>
+
             <button style="margin-left:20px" onclick="changeCyl(-0.25)">Darken</button>
             <button onclick="changeCyl(0.25)">Lighten</button>
             <button style="margin-left:20px" onclick="rotateFan(-15)"><<</button>
@@ -713,11 +866,10 @@ refreshScale(true);
 <div style="margin-top:15px;">
  <span ><b>CYL Value <span style="color:darkblue" id="cylVal">0.00</span></b> </span>
 </div>
-          <div style="margin-top:10px" id="fan-wrapper">
 
 
-            <canvas id="fan-container"></canvas>
-          </div>
+
+
 
         </div> <!-- left-controls -->
 
