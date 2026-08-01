@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link
+  rel="preload"
+  as="image"
+  href="https://sp-rx.github.io/trainer_light/FCBG_BAL.jpg"
+>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Duochrome and Fan Chart Visualizer</title>
@@ -18,7 +23,7 @@
     color: #404040;
     justify-content: center;
     background: lightgrey;
-    transform: scale(0.75);
+    transform: scale(0.5);
 
   }
 
@@ -262,12 +267,12 @@
 }
 
 #balancedButton.active {
-  background-color: #d9d9d9;
+  background-color: #d1d1d1;
   color: black;
 }
 
 #balancedButtonFC.active {
-  background-color: #d9d9d9;
+  background-color: #d1d1d1;
   color: black;
 }
 
@@ -376,8 +381,7 @@
 
 
   <span><b>Sphere Delta</b></span>
-<div style="margin-top:2%">
-</div>
+<div style="margin-top:1%"></div>
 
 <button
   id="balancedButton"
@@ -777,7 +781,7 @@ refreshScale(true);
   <div id="page-wrapper">
 
     <span><b>Astigmatism Delta</b></span>
-<br>
+<div style="margin-top:1%"></div>
 <button 
   id="balancedButtonFC"
   type="button"
@@ -809,7 +813,7 @@ function toggleBalancedFC() {
 
 <div 
   class="balancedFC" 
-  style="display:none; background-color:#ebebeb; width:90%; border-radius:50px; margin:1% auto; flex-direction:column; justify-content:center; align-items:center;"
+  style="display:none; background-color:#ebebeb; width:90%; border-radius:50px; margin:2% auto; flex-direction:column; justify-content:center; align-items:center;"
 >
 
 
@@ -821,7 +825,7 @@ function toggleBalancedFC() {
 </div>
 
 
-<div style="background-color:#ebebeb; width:90%; border-radius:50px; margin:1% auto; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+<div style="background-color:#ebebeb; width:90%; border-radius:50px; margin:2% auto; display:flex; flex-direction:column; justify-content:center; align-items:center;">
 
 
 <div><span><br><b>Your Current Astigmatism Chart</b></span></div>
