@@ -1,2157 +1,1443 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<title>Contact Lens Selector</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+<link
+  rel="preload"
+  as="image"
+  href="https://sp-rx.github.io/trainer_light/FCBG_BAL.jpg"
+>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duochrome and Fan Chart Visualizer</title>
 <style>
-/* ============================================================
-   DESIGN TOKENS
-============================================================ */
-:root {
-  --bg:           #f5f7fa;
-  --surface:      #ffffff;
-  --surface-alt:  #f0f4ff;
-  --surface-warm: #fffdf5;
-  --border:       rgba(30,60,120,0.10);
-  --border-strong:rgba(30,60,120,0.22);
-  --accent:       #1a4fa0;
-  --accent-lt:    #e8effd;
-  --accent2:      #0e7f6e;
-  --accent2-lt:   #e6f5f2;
-  --danger:       #c0392b;
-  --warning:      #e67e22;
-  --text:         #111827;
-  --text-mid:     #374151;
-  --text-muted:   #6b7280;
-  --text-faint:   #9ca3af;
-  --radius-sm:    8px;
-  --radius:       12px;
-  --radius-lg:    18px;
-  --shadow-sm:    0 1px 3px rgba(0,0,0,0.07);
-  --shadow:       0 4px 16px rgba(0,0,0,0.08);
-  --shadow-lg:    0 12px 40px rgba(0,0,0,0.14);
-  --font-body:    'DM Sans', sans-serif;
-  --font-display: 'Lora', Georgia, serif;
+
+
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    font-family: Arial;
+    font-size: 15px;
+    color: #404040;
+    justify-content: center;
+    background: lightgrey;
+    transform: scale(0.8);
+
+  }
+
+@media (max-width: 480px) {
+  body {
+    height: auto;
+    justify-content: flex-start;
+    padding-top: 20px; /* optional */
+  }
+
+  #app {
+    transform: scale(0.5);
+    transform-origin: top center;
+  }
 }
 
-/* ============================================================
-   RESET & BASE
-============================================================ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: var(--font-body);
-  font-size: 13px;
-  line-height: 1.55;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-/* Subtle grid pattern background */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(26,79,160,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26,79,160,0.025) 1px, transparent 1px);
-  background-size: 32px 32px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ============================================================
-   OVERLAY
-============================================================ */
-#overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--surface);
-  color: var(--text-mid);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-family: var(--font-body);
-  z-index: 9999;
-  letter-spacing: 0.01em;
-}
-
-/* ============================================================
-   LAYOUT
-============================================================ */
-.container {
-  position: relative;
-  z-index: 1;
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 24px 80px;
-}
-
-/* ============================================================
-   PAGE HEADER
-============================================================ */
-.page-header {
-  text-align: center;
-  padding: 48px 0 32px;
-}
-
-.page-header .eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 10px;
-}
-
-.page-header h2 {
-  font-family: var(--font-display);
-  font-size: clamp(22px, 3.5vw, 30px);
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.25;
-}
-
-.page-header h2 em {
-  font-style: italic;
-  color: var(--accent);
-}
-
-.header-rule {
-  width: 48px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  margin: 16px auto 20px;
-  border-radius: 2px;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-/* ============================================================
-   SECTION CARDS
-============================================================ */
-.section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
-  margin: 12px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-.section2 {
-  background: var(--surface-alt);
-  border: 1px solid rgba(26,79,160,0.13);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
-  margin: 12px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-.section3 {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
-  margin: 12px 0;
-  box-shadow: var(--shadow-sm);
-}
-
-/* Section headings */
-h2 {
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0 0 12px;
-  letter-spacing: -0.01em;
-}
-
-h1 {
-  font-family: var(--font-display);
-  font-size: 20px;
-  text-align: center;
-  margin: 12px 0;
-  font-weight: 600;
-}
-
-h3 {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  text-align: center;
-}
-
-/* ============================================================
-   CHECKBOXES & OPTIONS
-============================================================ */
-.options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 8px 16px;
-}
-
-.options label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--bg);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  font-size: 12.5px;
-  color: var(--text-mid);
-}
-
-.options label:hover {
-  border-color: var(--accent);
-  background: var(--accent-lt);
-  color: var(--accent);
-}
-
-input[type="checkbox"] {
-  accent-color: var(--accent);
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-
-/* Checked label style */
-.options label:has(input:checked) {
-  border-color: var(--accent);
-  background: var(--accent-lt);
-  color: var(--accent);
-  font-weight: 500;
-}
-
-/* ============================================================
-   INPUTS
-============================================================ */
-input[type="text"],
-input[type="number"],
-textarea,
-select {
-  font-family: var(--font-body);
-  font-size: 12.5px;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  padding: 7px 10px;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  outline: none;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(26,79,160,0.1);
-}
-
-textarea {
-  resize: vertical;
-  min-height: 80px;
-  width: 90%;
-}
-
-/* ============================================================
-   BUTTONS
-============================================================ */
-button {
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  padding: 7px 14px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-
-button:hover:not(:disabled) {
-  background: #153d85;
-  box-shadow: 0 2px 8px rgba(26,79,160,0.25);
-  transform: translateY(-1px);
-}
-
-button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-button:disabled {
-  background: var(--text-faint);
-  cursor: not-allowed;
-}
-
-/* Outlined / secondary buttons */
-button.btn-outline {
-  background: var(--surface);
-  color: var(--accent);
-  border: 1px solid var(--accent);
-}
-button.btn-outline:hover:not(:disabled) {
-  background: var(--accent-lt);
-  box-shadow: none;
-}
-
-/* Soft yellow action button */
-button.btn-soft {
-  background: #fef9c3;
-  color: var(--text);
-  border: 1px solid #d97706;
-}
-button.btn-soft:hover:not(:disabled) {
-  background: #fde68a;
-  box-shadow: none;
-}
-
-/* Danger */
-button.btn-danger {
-  background: var(--danger);
-}
-button.btn-danger:hover:not(:disabled) {
-  background: #96281b;
-}
-
-/* Green accent */
-button.btn-green {
-  background: var(--accent2);
-}
-button.btn-green:hover:not(:disabled) {
-  background: #0a6458;
-}
-
-/* ============================================================
-   SEARCH ROW
-============================================================ */
-.search-row {
-  display: flex;
-  gap: 12px;
-  margin: 12px 0;
-}
-
-.search-row input {
-  flex: 1;
-  padding: 9px 13px;
-  border-radius: var(--radius);
-  font-size: 13px;
-  border: 1px solid var(--border-strong);
-}
-
-/* ============================================================
-   SORT BAR
-============================================================ */
-#sortBar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 14px 0 10px;
-  padding: 12px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  font-size: 12.5px;
-}
-
-#sortBar select {
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-}
-
-/* ============================================================
-   RESULT CARDS GRID
-============================================================ */
-#cardsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 14px;
-}
-
-.lens-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  cursor: pointer;
-  transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
-  box-shadow: var(--shadow-sm);
-}
-
-.lens-card:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-2px);
-  border-color: var(--accent);
-}
-
-.card-compact {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.card-compact .photo img {
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: default;
-}
-
-/* ============================================================
-   PROMO BADGE
-============================================================ */
-.promo-badge {
-  display: inline-block;
-  margin-top: 8px;
-  background: var(--danger);
-  color: #fff;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-/* ============================================================
-   LIGHTBOX
-============================================================ */
-#imgZoom {
-  position: fixed;
-  inset: 0;
-  display: none;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  cursor: zoom-out;
-}
-
-#imgZoom.open { display: flex; }
-
-#imgZoom .inner {
-  position: relative;
-}
-
-#imgZoom .hint {
-  position: absolute;
-  right: 8px;
-  bottom: -26px;
-  color: rgba(255,255,255,0.7);
-  font-size: 11px;
-  user-select: none;
-  font-family: var(--font-body);
-}
-
-#zoomCardBox {
-  display: none;
-  max-width: 880px;
-  width: 90vw;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  box-shadow: var(--shadow-lg);
-  cursor: default;
-}
-
-.zoom-card-flex {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.zoom-card-flex .photo img {
-  width: 100%;
-  max-width: 600px;
-  height: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  display: block;
-  margin: 0 auto;
-}
-
-.zoom-card-flex .details {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.zoom-card-flex .details b {
-  color: var(--text-mid);
-  font-weight: 600;
-}
-
-/* ============================================================
-   WHATSAPP SECTION
-============================================================ */
-.wa-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-}
-
-.wa-section input[type="text"] {
-  width: 90%;
-  text-align: center;
-  padding: 9px 14px;
-  border-radius: var(--radius);
-}
-
-.wa-row {
+.duochrome {
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+
+  transform: scale(0.5);
+  transform-origin: center;
 }
 
-#countryDisplay {
-  font-size: 12px;
-  color: var(--accent2);
-  font-weight: 500;
-}
+.duo-side {
+  position: relative;
+  width: 300px;
+  height: 650px;
 
-/* ============================================================
-   RX TABLE
-============================================================ */
-.rx-table {
-  width: 90%;
-  border-collapse: collapse;
-  margin: auto;
-  text-align: center;
-  font-size: 12px;
-}
-
-.rx-table thead tr {
-  background: var(--accent-lt);
-}
-
-.rx-table thead th {
-  padding: 10px 14px;
-  font-weight: 600;
-  color: var(--accent);
-  font-size: 12px;
-}
-
-.rx-table tbody tr:not(.spacer) {
-  background: var(--bg);
-  border-radius: var(--radius-sm);
-}
-
-.rx-table td {
-  padding: 10px 12px;
-  border: none;
-}
-
-/* ============================================================
-   CONVERTER SECTION
-============================================================ */
-#clOut {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  background: var(--surface-warm);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px;
-  font-size: 12.5px;
-}
-
-/* ============================================================
-   RX ICONS ROW
-============================================================ */
-.rx-icons {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
-.rx-icons label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: var(--text-mid);
-  text-align: center;
-  flex: 1;
-  min-width: 120px;
-}
-
-.rx-icons img {
-  max-width: 100%;
-  width: auto;
-  max-height: 90px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  padding: 4px;
-}
-
-/* ============================================================
-   DEF TERMS
-============================================================ */
-.def-term {
-  cursor: pointer;
-  text-decoration: underline dotted;
-  text-underline-offset: 2px;
-  color: var(--accent);
-}
-
-.def-row .def-extra {
-  display: none;
-  margin: 6px 0 0;
-  font-weight: 400;
-  color: var(--text-mid);
-  font-size: 12px;
-  background: var(--accent-lt);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-}
-
-/* ============================================================
-   TOOLBAR / CONTROL BAR
-============================================================ */
-.toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
+  justify-content: center;
+
+  overflow: hidden;
+  contain: paint;
+  isolation: isolate;
 }
 
-/* ============================================================
-   COMPARE BOX
-============================================================ */
-#compareBox {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  margin: 16px 0;
-  box-shadow: var(--shadow);
+/* fallback for overflow: clip */
+@supports (overflow: clip) {
+  .duo-side {
+    overflow: clip;
+  }
 }
 
-#compareBox table {
+/* split field */
+#redSide  { clip-path: inset(0 0 0 9px); }
+#blueSide { clip-path: inset(0 9px 0 0); }
+
+/* base image */
+.duo-side img.base {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 12.5px;
+  height: 100%;
+  object-fit: contain;
+
+  display: block;
+  will-change: filter;
 }
 
-#compareBox th,
-#compareBox td {
-  padding: 8px 10px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
+/* overlay image (for blur / shift effects) */
+.duo-side img.overlay {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+
+  pointer-events: none;
+
+  will-change: transform, filter, opacity;
+  backface-visibility: hidden;
+  transform: translate3d(0,0,0);
+}
+/* Button styling */
+.toggle-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #fff;
+  color: black;
+  cursor: pointer;
+  border-radius: 5px;
+  user-select: none;
 }
 
-#compareBox th {
-  color: var(--accent);
-  font-weight: 600;
+/* Content styling */
+.toggle-content {
+  display: block; /* default visible */
+}
+  #header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 10px;
+  }
+
+.reso-btn {
+    border: 1px solid grey;
+    font-size: 12px;
+    padding: 2px;
+    height: 70px;
+    width: 75px;
+    border-radius: 10px;
+    color: #404040;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    user-select:none;
+    font-weight:600;
 }
 
-/* ============================================================
-   PROMO IMAGE SECTION
-============================================================ */
-.promo-images {
+
+.section{
+  background:#c1c1c1;
+  border:1px solid var(--line);
+  border-radius:50px;
+  padding:30px 0px 40px 0px;
+  margin:0px 0;
+  width:700px;
+}
+  #container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+
+  #cylVal { font-weight: bold; margin-left:5px; }
+
+  button {
+    border: 1px solid grey;
+    font-size: 10px;
+    padding: 2px;
+    height: 30px;
+    width: 75px;
+    border-radius: 10px;
+    color: #404040;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    user-select:none;
+    font-weight:600;
+
+  }
+
+  .smallbtn {
+    border: 1px solid grey;
+    font-size: 15px;
+    padding: 2px;
+    height: 25px;
+    width: 100px;
+    border-radius: 10px;
+    color: #404040;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    user-select:none;
+  }
+
+#fan-wrapper {
+  display: inline-flex;   /* key */
+  width: 520px;
+  height: 450px;
+  background-image: url("https://sp-rx.github.io/trainer_light/FCBG.jpg");
+  background-size: cover;       
+  background-position: center;  
+  background-repeat: no-repeat;
+  position: relative;
   display: flex;
+  justify-content: center;     
+  align-items: center;         
+  overflow: hidden;            
+  border-radius: 50px;          
+}
+
+#fan-wrapper-bal {
+  display: inline-flex;   /* key */
+  width: 520px;
+  height: 450px;
+  background-image: url("https://sp-rx.github.io/trainer_light/FCBG_BAL.jpg");
+  background-size: cover;       
+  background-position: center;  
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  justify-content: center;     
+  align-items: center;         
+  overflow: hidden;            
+  border-radius: 50px;          
+}
+
+#fan-container {
+  width: 480px;       /* fan smaller than wrapper */
+  height: 480px;
+  background: transparent;
+  display: block;
+  margin-top: 35px;   
+  margin-left: 3px;
+}
+
+#page-wrapper {
+  display: inline-flex;   /* key */
+  justify-content: center;    
+  width: 100%;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
 }
 
-.promo-images img {
-  width: 90%;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+.bg-dc {
+  width: 520px;
+  height: 350px;
+  background-image: url("https://sp-rx.github.io/trainer_light/DCBG.jpg");
+  background-size: 120% auto;  /* zoom in 20% */
+  background-position: center calc(50% - 20%) ; 
+  background-repeat: no-repeat;
+  margin: 0 auto;
+  border-radius: 50px;
 }
 
-/* ============================================================
-   TOGGLE LINKS
-============================================================ */
-.toggle-link {
-  text-decoration: underline;
-  cursor: pointer;
-  user-select: none;
-  color: var(--accent);
-  font-size: 12.5px;
-  font-weight: 500;
+#dc-container{
+  display: inline-flex;   /* key */
+  align-items:center;
+  gap:20px;
+  justify-content: center;    
 }
 
-/* ============================================================
-   UTILITY
-============================================================ */
-.simple-hide { display: none !important; }
-
-.results { margin-top: 14px; }
-
-.text-center { text-align: center; }
-
-.badge-section-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 10px;
+.dc-controls{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
 }
 
-.badge-section-label::before,
-.badge-section-label::after {
-  content: '';
-  height: 1px;
-  width: 24px;
-  background: var(--border-strong);
-  display: block;
+.reso-btn.active {
+  background:darkred;
+  color:white;
+
+  }
+
+.hidden {
+  display: none !important;
 }
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
-@media (max-width: 900px) {
-  #cardsGrid { grid-template-columns: repeat(2, minmax(200px, 1fr)); }
+#balancedButton.active {
+  background-color: darkred;
+  color: white;
 }
-@media (max-width: 550px) {
-  #cardsGrid { grid-template-columns: 1fr; }
-  .container { padding: 0 12px 60px; }
-  .search-row { flex-direction: column; }
-  #zoomCardBox { padding: 16px; }
+
+#balancedButtonFC.active {
+  background-color: darkred;
+  color: white;
 }
+
 </style>
 </head>
+
+
 <body>
+<div id="app">
 
-<!-- 🔒 Locked screen -->
-<div style="display:none; font-size: 13px;" id="overlay">🔒 Entering password...</div>
 
-<!-- Main content -->
-<div class="container" id="content" style="display:none;">
+<div style="max-width:90%; margin-top:-100px">
 
-  <div style="height: 80px"></div>
+<table>
 
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <p class="eyebrow">Kiara Optometry</p>
-    <h2>Contact Lens <em>Selector</em></h2>
-    <div class="header-rule"></div>
-    <div class="header-actions">
-<button style="background-color:#f5f7fa; color:black" onclick="toggleSpan('promo')">
--
+
+<tr>
+<td>
+
+
+
+
+<div style="text-align:left; margin-top:0px; margin-bottom:0px">
+<span style="font-size:25px"><b>Kiara Optometry's</b></span><br>
+<span style="font-size:20px">Duochrome & Fan Chart Visualizer</span>
+
+
+</td></tr>
+
+<tr><td>
+<div style="display:none">
+
+<div style="height:60px"></div>
+
+<div class="section">
+
+
+<span style="font-size:25px"><b>Sphere Deficit</b></span><br>
+
+<div style="margin-top:10px"></div>
+
+<div class="toggle-button" onclick="toggleDiv(this)">Show / Hide</div>
+
+<div class="toggle-content">
+
+
+
+<div style="margin-top:20px" >
+  <span><b>Which type of duochrome pattern do you see?</b></span>
+
+</div>
+
+<div style="margin-top:10px">
+  <span style="font-size:25px"><b>SPH Value Correction <span id="dcHint">0.00</span></span>
+
+</div>
+
+<div style="height:20px"></div>
+
+<div id="dc-container">
+  
+  <!-- Left controls -->
+  <div class="dc-controls">
+    <button class="button" onclick="selectDC(1)"><b><span style="color:darkred"> Red 1</span></b></button>
+    <button class="button" onclick="selectDC(2)"><b><span style="color:darkred"> Red 2</span></b></button>
+    <button class="button" onclick="selectDC(5)"><b><span style="color:#404040">Both Clear</span></b></button>
+  </div>
+
+  <!-- Center image -->
+  <div class="bg-dc"></div>
+
+  <!-- Right controls -->
+  <div class="dc-controls">
+    <button class="button" onclick="selectDC(3)"><b><span style="color:darkblue"> Blue 3</span></b></button>
+    <button class="button" onclick="selectDC(4)"><b><span style="color:darkblue"> Blue 4</span></b></button>
+    <button class="button" onclick="selectDC(6)"><b><span style="color:#404040">Both Blur</span></b></button>
+  </div>
+
+</div>
+
+
+
+
+</div>
+</div>
+</div>
+</td></tr>
+
+</table>
+
+</div>
+
+
+<table>
+
+
+
+
+<tr>
+<td align="center" style="text-align:center;">
+
+
+<div class="section" style="margin-top:20px;">
+
+
+
+
+  <span><b>Sphere Delta</b></span>
+<div style="margin-top:1%"></div>
+
+<button
+  id="balancedButton"
+  type="button"
+  style="height:30px; width:40%;"
+  onclick="toggleBalancedDuo()"
+>
+  Show / Hide Example of Balanced Duochrome
 </button>
 
-
-<button style="background-color:#f5f7fa; color:black" onclick="toggleDiv2()">-</button>
-
-    </div>
-  </div>
-
-  <!-- PROMO SECTION -->
-  <div id="promo" style="display:none">
-    <div class="section" style="display:flex; flex-direction:column; justify-content:center; align-items:center">
-      <div class="section3" style="width:90%">
-        <h3 class="text-center" style="margin-bottom:16px;">Current Promotions</h3>
-        <div class="promo-images">
-          <img src="https://sp-rx.github.io/CL-SELECTOR/acuvue_lens_promo.jpg" alt="Promo">
-          <img src="https://sp-rx.github.io/CL-SELECTOR/o1d.jpg" alt="Promo 2">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- WHATSAPP SECTION -->
-  <div class="section" id="myDiv2" style="display:none">
-    <div class="badge-section-label"><span>WhatsApp Messaging</span></div>
-    <div class="wa-section">
-      <input id="waName" type="text" placeholder="Enter patient name" style="width:90%; text-align:center; border-radius:8px;">
-
-      <div style="display:flex; flex-direction:column; align-items:center; gap:4px; width:100%;">
-        <input id="waNumber" type="text" placeholder="WhatsApp number with country code (e.g. 601170199170)" style="width:90%; text-align:center; border-radius:8px;">
-        <span id="countryDisplay">Malaysia</span>
-      </div>
-
-      <div class="wa-row">
-        <button onclick="addPersonalPreset()">👋 Greetings</button>
-        <button class="btn-outline" onclick="undoMsg()">↩ Undo</button>
-        <button class="btn-outline" onclick="redoMsg()">↪ Redo</button>
-        <button class="btn-soft" onclick="openWhatsApp()">Open WhatsApp ↗</button>
-      </div>
-
-      <textarea id="waMessage" rows="4" placeholder="Type or select preset messages..." style="width:90%; height:80px;"></textarea>
-
-      <!-- Preset toggle -->
-      <div style="display:none; text-align:center;">
-        <button id="presetToggleBtn" class="btn-outline">Show Presets</button>
-      </div>
-
-      <div id="presetButtons" style="display:none;">
-        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; max-width:480px; margin-top:6px;">
-          <button onclick="addSet('A')">Set A – Vita Sph</button>
-          <button onclick="addSet('B')">Set B – Vita Astig</button>
-          <button onclick="addSet('C')">Set C – O2W Sph</button>
-          <button onclick="addSet('D')">Set D – O2W Astig</button>
-          <button onclick="addPreset('Thank you for placing the order! We will text you once the contact lenses are ready!')">Place Order</button>
-          <button class="btn-green" onclick="totalUp()">Total Up</button>
-        </div>
-      </div>
-
-      <script>
-      (function(){
-        const btn = document.getElementById("presetToggleBtn");
-        const box = document.getElementById("presetButtons");
-        let open = false;
-        function render(){
-          box.style.display = open ? "block" : "none";
-          btn.textContent = open ? "Hide Presets" : "Show Presets";
-        }
-        btn.addEventListener("click", () => { open = !open; render(); });
-        render();
-      })();
-      </script>
-
-      <!-- RX toggle -->
-      <div style="display:none; text-align:center;">
-        <button type="button" id="rxSectionToggle" class="btn-outline">Show RX Input Table</button>
-      </div>
-
-      <!-- RX SECTION -->
-      <div id="rxSection">
-        <div style="display:none; text-align:center; margin-bottom:12px;">
-          <table class="rx-table">
-            <thead>
-              <tr>
-                <th>Eye</th>
-                <th>SPH</th>
-                <th>CYL</th>
-                <th>AXIS</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="spacer"><td style="height:6px"></td></tr>
-              <tr>
-                <td style="font-weight:600; color:var(--text-mid);">Right (R)</td>
-                <td>
-                  <input id="rSph" type="number" step="0.25" value="0.00" style="width:90px; text-align:center; margin-bottom:10px;"><br>
-                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('r','sph',-1)" class="btn-danger">−1.00</button>
-                      <button onclick="adjustSingle('r','sph',+1)">+1.00</button>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('r','sph',-0.25)" class="btn-danger">−0.25</button>
-                      <button onclick="adjustSingle('r','sph',+0.25)">+0.25</button>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <input id="rCyl" type="number" step="0.25" value="0.00" style="width:90px; text-align:center; margin-bottom:10px;"><br>
-                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('r','cyl',-1)" class="btn-danger">−1.00</button>
-                      <button onclick="adjustSingle('r','cyl',+1)">+1.00</button>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('r','cyl',-0.25)" class="btn-danger">−0.25</button>
-                      <button onclick="adjustSingle('r','cyl',+0.25)">+0.25</button>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <input id="rAxis" type="number" step="1" value="0" style="width:90px; text-align:center; margin-bottom:10px;"><br>
-                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('r','axis',-20)" class="btn-danger">−20°</button>
-                      <button onclick="adjustSingle('r','axis',+20)">+20°</button>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('r','axis',-5)" class="btn-danger">−5°</button>
-                      <button onclick="adjustSingle('r','axis',+5)">+5°</button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-              <tr class="spacer"><td style="height:6px"></td></tr>
-              <tr>
-                <td style="font-weight:600; color:var(--text-mid);">Left (L)</td>
-                <td>
-                  <input id="lSph" type="number" step="0.25" value="0.00" style="width:90px; text-align:center; margin-bottom:10px;"><br>
-                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('l','sph',-1)" class="btn-danger">−1.00</button>
-                      <button onclick="adjustSingle('l','sph',+1)">+1.00</button>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('l','sph',-0.25)" class="btn-danger">−0.25</button>
-                      <button onclick="adjustSingle('l','sph',+0.25)">+0.25</button>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <input id="lCyl" type="number" step="0.25" value="0.00" style="width:90px; text-align:center; margin-bottom:10px;"><br>
-                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('l','cyl',-1)" class="btn-danger">−1.00</button>
-                      <button onclick="adjustSingle('l','cyl',+1)">+1.00</button>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('l','cyl',-0.25)" class="btn-danger">−0.25</button>
-                      <button onclick="adjustSingle('l','cyl',+0.25)">+0.25</button>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <input id="lAxis" type="number" step="1" value="0" style="width:90px; text-align:center; margin-bottom:10px;"><br>
-                  <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('l','axis',-20)" class="btn-danger">−20°</button>
-                      <button onclick="adjustSingle('l','axis',+20)">+20°</button>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                      <button onclick="adjustSingle('l','axis',-5)" class="btn-danger">−5°</button>
-                      <button onclick="adjustSingle('l','axis',+5)">+5°</button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div style="margin-top:14px; display:flex; gap:8px; justify-content:center;">
-            <button onclick="addRxToMessage()">Add RX to Message</button>
-            <button class="btn-outline" onclick="clearRx()">Clear RX</button>
-          </div>
-        </div>
-      </div>
-
-      <script>
-      (function(){
-        const btn = document.getElementById("rxSectionToggle");
-        const sec = document.getElementById("rxSection");
-        if(!btn || !sec) return;
-        let open = false;
-        function render(){
-          sec.style.display = open ? "block" : "none";
-          btn.textContent = open ? "Hide RX Input Table" : "Show RX Input Table";
-        }
-        btn.addEventListener("click", () => { open = !open; render(); });
-        render();
-      })();
-      </script>
-
-    </div><!-- end wa-section -->
-  </div><!-- end section -->
-
-  <div style="height:24px"></div>
-
-  <!-- SEARCH SECTION -->
-  <div id="targetSection">
-
-     <div class="section2" id="specToCL">
-       <h2>  <span style="cursor:pointer; user-select:none" onclick="toggleDiv3()">Spectacle to Contact Lens Power Converter
- </span></h2>
-
-<div id="myDiv3" style="display:none">
-        <div style="display:flex; align-items:flex-end; flex-wrap:wrap; gap:12px;">
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <strong style="color:var(--text-mid);">RE Specs:</strong>
-            Sph <input id="sph-re" type="number" step="0.25" style="width:70px; text-align:center;">
-            Cyl <input id="cyl-re" type="number" step="0.25" max="0" style="width:70px; text-align:center;">
-            Axis <input id="axis-re" type="number" min="0" max="180" step="1" style="width:70px; text-align:center;">
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <strong style="color:var(--text-mid);">LE Specs:</strong>
-            Sph <input id="sph-le" type="number" step="0.25" style="width:70px; text-align:center;">
-            Cyl <input id="cyl-le" type="number" step="0.25" max="0" style="width:70px; text-align:center;">
-            Axis <input id="axis-le" type="number" min="0" max="180" step="1" style="width:70px; text-align:center;">
-          </div>
-          <button id="convertBtn">Convert</button>
-        </div>
-        <div style="display:flex; gap:14px; margin-top:14px; align-items:flex-start; flex-wrap:wrap;">
-          <div id="clOut">
-            <div>
-              <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">RE Results</div>
-              <div id="reResult" style="height:140px, font-size:12px; line-height:2.8;"></div>
-            </div>
-            <div>
-              <div style="font-weight:700; margin-bottom:6px; color:var(--accent);">LE Results</div>
-              <div id="leResult" style="height:140px; font-size:12px; line-height:2.8;"></div>
-            </div>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:5px;">
-            <button style="margin-top:40px" id="auto1">Auto-fill 1</button>
-            <button id="auto2">Auto-fill 2</button>
-            <button id="auto3">Auto-fill 3</button>
-            <button id="autoSE" class="btn-outline">Auto-fill SE</button>
-          </div>
-        </div>
-</div>
-      </div>
-
-    <div class="section" id="searchSec">
-      <div style="margin-top:0%" class="badge-section-label"><span>Prescription Search</span></div>
-<br>
-
-<label>Sph</label>
-<input style="width:15%;  margin-right:2%" type="text" id="sph" placeholder="+0.00">
-
-<label>Cyl</label>
-<input style="width:15%; margin-right:2%" type="text" id="cyl" placeholder="-1.25">
-
-<label>Axis</label>
-<input style="width:15%" type="text" id="axis" placeholder="180">
-
-<button style="margin-left:2%" type="button" onclick="copyToEye('RE')">Enter to RE</button>
-<button type="button" onclick="copyToEye('LE')">Enter to LE</button>
-<button type="button" onclick="clearRxInputs()">✕</button>
-
-
 <script>
+function toggleBalancedDuo() {
+  const balancedDuo = document.querySelector(".balanceduo");
+  const button = document.querySelector("#balancedButton");
 
-function snapQuarter(input) {
-  let value = parseFloat(input.value);
+  const isHidden = getComputedStyle(balancedDuo).display === "none";
 
-  if (isNaN(value)) {
-    input.value = "";
-    return;
-  }
-
-  value = Math.round(value * 4) / 4;
-
-  // Remove negative zero
-  if (Object.is(value, -0)) value = 0;
-
-  input.value = (value >= 0 ? "+" : "") + value.toFixed(2);
-}
-
-function snapCyl(input) {
-  let value = parseFloat(input.value);
-
-  if (isNaN(value)) {
-    input.value = "";
-    return;
-  }
-
-  // Allowed cylinder values
-  const allowedCyl = [-0.75, -1.25, -1.75, -2.25];
-
-  // Find the nearest allowed cylinder
-  let nearest = allowedCyl[0];
-
-  for (const cyl of allowedCyl) {
-    if (Math.abs(value - cyl) < Math.abs(value - nearest)) {
-      nearest = cyl;
-    }
-  }
-
-  input.value = nearest.toFixed(2);
-}
-
-function snapAxis(input) {
-  let value = parseFloat(input.value);
-
-  if (isNaN(value)) {
-    input.value = "";
-    return;
-  }
-
-  // Round to nearest 10
-  value = Math.round(value / 10) * 10;
-
-  // Keep axis between 10 and 180
-  if (value < 10) value = 180;
-  if (value > 180) value = 180;
-
-  input.value = value;
-}
-
-document.getElementById("sph").addEventListener("blur", function () {
-  snapQuarter(this);
-});
-
-document.getElementById("cyl").addEventListener("blur", function () {
-  snapCyl(this);
-});
-
-document.getElementById("axis").addEventListener("blur", function () {
-  snapAxis(this);
-});
-
-function formatPower(value) {
-  value = parseFloat(value);
-
-  if (isNaN(value)) return "0.00";
-
-  return (value >= 0 ? "+" : "") + value.toFixed(2);
-}
-
-function copyToEye(side) {
-  const sphText = document.getElementById("sph").value.trim();
-
-  // Don't enter anything if SPH is empty
-  if (sphText === "") {
-    if (side === "RE") {
-      document.getElementById("searchRE").value = "";
-    } else {
-      document.getElementById("searchLE").value = "";
-    }
-    return;
-  }
-
-  const sphValue = parseFloat(sphText);
-  const cylValue = parseFloat(document.getElementById("cyl").value) || 0;
-
-  const sph = formatPower(sphValue);
-  const cyl = formatPower(cylValue);
-
-  let axis = document.getElementById("axis").value.trim();
-  if (axis === "" || axis === "0") axis = "180";
-
-  let rx = `S${sph}`;
-
-  if (Math.abs(cylValue) > 0.001) {
-    rx += ` C${cyl} x${axis}`;
-  }
-
-  if (side === "RE") {
-    document.getElementById("searchRE").value = rx;
+  if (isHidden) {
+    balancedDuo.style.display = "block";
+    button.classList.add("active");
   } else {
-    document.getElementById("searchLE").value = rx;
+    balancedDuo.style.display = "none";
+    button.classList.remove("active");
   }
 }
+</script>
 
-function clearRxInputs() {
-  document.getElementById("sph").value = "";
-  document.getElementById("cyl").value = "";
-  document.getElementById("axis").value = "";
-}
-</script>	
+
+<div class="balanceduo" style="display:none; background-color:#fff; height:420px; width:90%; border-radius:50px; margin:2% auto;">
+
+<div class="duo-wrap rx-block">
 <br>
-      <div style="margin-top:5%" class="badge-section-label"><span>Lens Search</span></div>
+<span style="color:darkred"><b>Example of A Balanced Duochrome</b></span>
 
-      <div style="margin-top:0%" class="search-row">
-        <input type="text" id="searchRE" placeholder="🔍 Search Right Eye">
-<button style="margin-right:5%" type="button" onclick="clearInput('searchRE')">✖</button>
-
-        <input type="text" id="searchLE" placeholder="🔍 Search Left Eye (if needed)">
-<button type="button" onclick="clearInput('searchLE')">✖</button>
-
-<script>
-function clearInput(id) {
-  const input = document.getElementById(id);
-  input.value = "";
-  input.dispatchEvent(new Event("input")); // Optional: refreshes live search
-  input.focus(); // Optional: puts the cursor back in the input
-}
-</script>
-
-      </div>
-
-        <div class="options">
-          <label><input type="checkbox" name="q2" value="1 Day"> 1 Day</label>
-          <label><input type="checkbox" name="q2" value="2 Weeks"> 2 Weeks</label>
-          <label><input type="checkbox" name="q2" value="1 Month"> 1 Month</label>
-          <label><input type="checkbox" name="q2" value="3 Months"> 3 Months</label>
-        </div>
-    <div style="height:12px"></div>
-
-
-
-        <div class="options">
-          <label><input type="checkbox" name="q3" value="SPH"> Short or Far Sighted (SPH)</label>
-          <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
-          <label><input type="checkbox" name="q3" value="MF"> Multi-focal (MF)</label>
-        </div>
-
-    <div style="height:12px"></div>
-
-        <div class="options">
-          <label><input type="checkbox" name="q1" value="CLEAR"> Clear</label>
-          <label><input type="checkbox" name="q1" value="COLOUR"> Colour</label>
-        </div>
-
-
-
+  <div class="duochrome">
+    <div style="margin-top:-195px;" class="duo-side">
+      <img src="https://sp-rx.github.io/Trainer/RED_1.png">
     </div>
 
-
-    <div class="section">
-
-      <!-- Toolbar -->
-      <div class="toolbar">
-        <button id="promoBtn" style="display:none;" disabled>Show Promo Only</button>
-
-
-        <button id="showBtn" disabled>Loading…</button>
-        <button id="resetBtn" class="btn-outline">↺ Reset</button>
-
-
-<button style="margin-left:2%; background-color:lightblue; color:black" onclick="toggleDiv()">Show Filters</button>
-
-
-        <span id="btnText" style="opacity:0.6; font-size:12px;"></span>
-      </div>
-
-
-<div id="myDiv" style="display:none">
-
-      <!-- Q1 -->
-      <!-- Q2 -->
-      <!-- Q3 -->
-      <div style="display:none" class="section" id="q3">
-        <h2>What type of prescription (RX)?
-          <span id="rxToggleBtn" class="toggle-link" style="font-weight:400; font-size:11.5px; margin-left:8px;">See examples of RX types</span>
-        </h2>
-        <div id="rxIcons" class="rx-icons" style="display:none;">
-          <label>
-            <img src="https://sp-rx.github.io/CL-SELECTOR/SPH.png" alt="SPH">
-            SPH lenses only have one prescription, e.g. −5.00 (indicated by D).
-          </label>
-          <label>
-            <img src="https://sp-rx.github.io/CL-SELECTOR/ASTIG.png" alt="ASTIG">
-            ASTIG lenses have 2 extra prescriptions, e.g. −1.75 and 030.
-          </label>
-          <label>
-            <img src="https://sp-rx.github.io/CL-SELECTOR/MF.png" alt="MF">
-            MF lenses have an ADD prescription, e.g. MID (LOW or HI).
-          </label>
-        </div>
-        <div style="margin-top:10px;"></div>
-
-      </div>
-
-      <!-- Q6 -->
-      <div class="section" id="q6">
-        <h2>Types of Packing?</h2>
-        <div class="options">
-          <label><input type="checkbox" name="q6" value="LOOSE"> Travel Packs</label>
-          <label><input type="checkbox" name="q6" value="NOT_LOOSE"> Boxes</label>
-        </div>
-      </div>
-
-      <!-- Q4 (pro) -->
-      <div class="section" id="q4">
-        <h2>Comfort level?</h2>
-        <div class="options">
-          <label><input type="checkbox" name="q4" value="BASIC"> Basic</label>
-          <label><input type="checkbox" name="q4" value="GOOD"> Good</label>
-          <label><input type="checkbox" name="q4" value="PREMIUM"> Premium</label>
-        </div>
-      </div>
-
-      <!-- Q5 (pro) -->
-      <div class="section" id="q5">
-        <h2>Material type?</h2>
-        <div class="options">
-          <label><input type="checkbox" name="q5" value="HYDROGEL"> Hydrogel (Standard Oxygen)</label>
-          <label><input type="checkbox" name="q5" value="SILICONE HYDROGEL"> Silicone Hydrogel (High Oxygen)</label>
-        </div>
-      </div>
-
-
-
-        <button id="modeToggleBtn" style="display:none" class="btn-soft">See more filters</button>
-
-
-
-
-      <!-- Converter (pro) -->
- 
-</div>
-
-<script>
-function toggleDiv() {
-  const div = document.getElementById("myDiv");
-  div.style.display = div.style.display === "none" ? "block" : "none";
-}
-function toggleDiv2() {
-  const div = document.getElementById("myDiv2");
-  div.style.display = div.style.display === "none" ? "block" : "none";
-}
-function toggleDiv3() {
-  const div = document.getElementById("myDiv3");
-  div.style.display = div.style.display === "none" ? "block" : "none";
-}
-
-</script>
-</div>
-      <!-- Sort bar -->
-      <div id="sortBar" style="display:none;">
-        <strong style="color:var(--text-mid);">Sort:</strong>
-        <select id="sortSelect">
-          <option value="price-asc">Price Low → High</option>
-          <option value="price-desc">Price High → Low</option>
-          <option value="valuepair-asc">Value/Pair Low → High</option>
-          <option value="valuepair-desc">Value/Pair High → Low</option>
-          <option value="comfort-desc">Comfort Premium → Basic</option>
-          <option value="comfort-asc">Comfort Basic → Premium</option>
-          <option value="hours-desc">Wearing Hours Long → Short</option>
-          <option value="hours-asc">Wearing Hours Short → Long</option>
-        </select>
-      </div>
-
-    </div><!-- end section -->
-
-    <div id="compareArea"></div>
-
-    <div class="results" id="results">
-      <div id="cardsGrid"></div>
+    <div style="margin-top:-195px;" class="duo-side">
+      <img src="https://sp-rx.github.io/Trainer/BLUE_1.png">
     </div>
 
-  </div><!-- end targetSection -->
+</div>
+</div>
 
-</div><!-- end container -->
 
-<div style="height:200px"></div>
+</div>
 
-<!-- ====================== LIGHTBOX ====================== -->
-<div id="imgZoom" aria-modal="true" role="dialog">
-  <div class="inner">
-    <div id="zoomCardBox"></div>
-    <div class="hint">Tap outside or press Esc to close</div>
+
+
+
+
+<div style="background-color:white; height:420px; width:90%; border-radius:50px; margin:2% auto;">
+
+
+<div class="duo-wrap rx-block">
+<br>
+<span><b>Your Current Duochrome</b></span>
+
+  <div class="duochrome">
+
+    <div style="margin-top:-195px;" class="duo-side">
+      <img id="redImg"
+           src="https://sp-rx.github.io/Trainer/RED_1.png">
+    </div>
+
+    <div style="margin-top:-195px;" class="duo-side">
+      <img id="blueImg"
+           src="https://sp-rx.github.io/Trainer/BLUE_1.png">
+    </div>
+
   </div>
 </div>
 
-<!-- ====================== ALL SCRIPTS (unchanged logic) ====================== -->
 
-<script>
-/* Password overlay */
-(function(){
-  const overlay = document.getElementById("overlay");
-  const content = document.getElementById("content");
-  function checkPassword(){
-    let password = "";
-    const correctPassword = "";
-    while(password !== correctPassword){
-      password = prompt("Please enter password to use:");
-      if(password === null){ overlay.textContent = "Sorry, Access Denied."; return false; }
-      if(password !== correctPassword) alert("Wrong password. Try again.");
-    }
-    return true;
-  }
-  window.addEventListener("load", () => {
-    if(checkPassword()){ overlay.style.display = "none"; content.style.display = "block"; }
-  });
-})();
-</script>
-
-<script>
-/* Tap-to-expand binding */
-function bindDefToggles(scope = document){
-  scope.querySelectorAll('.def-term').forEach(el => {
-    if(el.dataset.ready) return;
-    el.dataset.ready = "1";
-    let extra = el.parentElement.querySelector('.def-extra');
-    if(!extra){
-      extra = document.createElement('div');
-      extra.className = 'def-extra';
-      el.parentElement.appendChild(extra);
-    }
-    el.addEventListener('click', () => {
-      const open = extra.style.display === 'block';
-      if(open){ extra.style.display = 'none'; extra.innerHTML = ''; }
-      else { extra.innerHTML = el.dataset.long || ''; extra.style.display = 'block'; }
-    });
-  });
-}
-</script>
-
-<script>
-/* RESULTS ENGINE */
-const csvUrl = 'https://sp-rx.github.io/CL-SELECTOR/CL%20DATABASE.csv';
-let products = []; let csvLoaded = false;
-
-const showBtn    = document.getElementById('showBtn');
-const promoBtn   = document.getElementById('promoBtn');
-const btnText    = document.getElementById('btnText');
-const sortBar    = document.getElementById('sortBar');
-const sortSelect = document.getElementById('sortSelect');
-const rxToggleBtn = document.getElementById('rxToggleBtn');
-const rxIcons    = document.getElementById('rxIcons');
-
-rxToggleBtn?.addEventListener('click', () => {
-  rxIcons.style.display = (rxIcons.style.display === 'none' || rxIcons.style.display === '') ? 'flex' : 'none';
-});
-
-function parseCSV(text){
-  const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim() !== '');
-  if(lines.length < 2) return {headers:[], rows:[]};
-  const splitRow = row => row.match(/(?:,|\n|^)(?:"([^"]*(?:""[^"]*)*)"|([^",\n]*))/g)
-    ?.map(s => s.replace(/^,/, ''))
-    ?.map(s => s.replace(/^"|"$/g, '').replace(/""/g, '"')) || [];
-  const headers = splitRow(lines[0]).map(h => h.trim());
-  const rows = lines.slice(1).map(line => splitRow(line));
-  return {headers, rows};
-}
-
-fetch(csvUrl, {cache:'no-store'})
-  .then(res => { if(!res.ok) throw new Error("HTTP " + res.status); return res.text(); })
-  .then(text => {
-    const {headers, rows} = parseCSV(text);
-    products = rows.map(r => { const o = {}; headers.forEach((h,i) => o[h] = (r[i] ?? '').trim()); return o; });
-    csvLoaded = true;
-    if(showBtn){ showBtn.disabled = false; showBtn.textContent = 'Show Results'; }
-    if(promoBtn){ promoBtn.disabled = false; promoBtn.textContent = 'Show Promo Only'; }
-    if(btnText){ btnText.textContent = ''; }
-  })
-  .catch(err => {
-    console.error("CSV Load Error:", err);
-    if(showBtn){ showBtn.disabled = true; showBtn.textContent = 'Load failed'; }
-    if(btnText){ btnText.textContent = 'Please refresh to retry.'; }
-  });
-
-function getSelections(){
-  const selected = {q1:[],q2:[],q3:[],q4:[],q5:[],q6:[]};
-  document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
-    if(selected[c.name]) selected[c.name].push(c.value.toUpperCase());
-  });
-  return selected;
-}
-
-function filterProducts(selected, query){
-  const q1Col = "LENS TYPE (CLEAR, COLOUR)";
-  const mCol  = "MODALITY (1 Day, 2 Weeks, 1 Month, 3 Months)";
-  const vCol  = "VISION (SPH, ASTIG, MF)";
-  const COMFORT_COL  = "COMFORT";
-  const MATERIAL_COL = "MATERIAL";
-
-let search = (query || '').toLowerCase();
-
-// Normalize only S±0.00 to S0.00
-search = search
-  .replace(/\bs\+0\.00\b/g, "s0.00")
-  .replace(/\bs-0\.00\b/g, "s0.00");
-
-const terms = search.split(/\s+/).filter(Boolean);
-
-return products.filter(p => {
-  const lensType = (p[q1Col] || '').toUpperCase();
-  const modality = (p[mCol]  || '').toUpperCase();
-  const vision   = (p[vCol]  || '').toUpperCase();
-  const comfort  = (p[COMFORT_COL]  || '').toUpperCase();
-  const material = (p[MATERIAL_COL] || '').toUpperCase();
-
-  if(selected.q1.length && !selected.q1.includes(lensType)) return false;
-  if(selected.q2.length && !selected.q2.includes(modality)) return false;
-  if(selected.q3.length && !selected.q3.includes(vision))   return false;
-  if(selected.q4.length && !selected.q4.includes(comfort))  return false;
-  if(selected.q5.length && !selected.q5.includes(material)) return false;
-
-  const fullName = p["FULL NAME"] || "";
-  const isLoose  = /\bloose\b/i.test(fullName);
-
-  if(selected.q6.length){
-    const wantsLoose    = selected.q6.includes("LOOSE");
-    const wantsNotLoose = selected.q6.includes("NOT_LOOSE");
-
-    if(wantsLoose !== wantsNotLoose){
-      if(wantsLoose && !isLoose) return false;
-      if(wantsNotLoose && isLoose) return false;
-    }
-  }
-
-  if(terms.length){
-    let rowText = Object.values(p).join(" ").toLowerCase();
-
-    // Treat S+0.00, S-0.00 and S0.00 as identical
-    rowText = rowText
-      .replace(/\bs\+0\.00\b/g, "s0.00")
-      .replace(/\bs-0\.00\b/g, "s0.00");
-
-    if(!terms.every(t => rowText.includes(t))) return false;
-  }
-
-  return true;
-});
-}
-
-
-function getNumericPrice(p){
-  const text = (p["1 BOX PRICE & UNIT"] || "").replace(/,/g,"");
-  const m = text.match(/(\d+(\.\d+)?)/);
-  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
-}
-function getNumericValuePerPair(p){
-  const text = (p["VALUE_PER_PAIR"] || "").toString().replace(/,/g,"").trim();
-  if(!text) return Number.POSITIVE_INFINITY;
-  const m = text.match(/(\d+(\.\d+)?)/);
-  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
-}
-function getWearingHours(p){
-  const v = parseFloat(String(p["WEARING_HOURS"] || "").replace(/[^\d.]/g,""));
-  return Number.isFinite(v) ? v : null;
-}
-function niceCase(s=""){ return String(s).toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
-function mapMaterial(s=""){
-  const u = s.toUpperCase().trim();
-  if(u === "HYDROGEL") return "Hydrogel (Standard Oxygen)";
-  if(u === "SILICONE HYDROGEL") return "Silicone Hydrogel (High Oxygen)";
-  return niceCase(s);
-}
-function mapComfortRank(s=""){
-  const u = (s || "").toUpperCase().trim();
-  if(u === "PREMIUM") return 3;
-  if(u === "GOOD")    return 2;
-  if(u === "BASIC")   return 1;
-  return 0;
-}
-</script>
-
-<script>
-/* ETA helpers */
-const PUBLIC_HOLIDAYS = new Set([
-  "2025-01-01","2025-01-29","2025-01-30","2025-02-01","2025-02-03","2025-02-11",
-  "2025-03-18","2025-03-31","2025-04-01","2025-05-01","2025-05-12","2025-06-02",
-  "2025-06-07","2025-06-27","2025-08-31","2025-09-01","2025-09-05","2025-09-15",
-  "2025-09-16","2025-10-20","2025-12-11","2025-12-25",
-  "2026-01-01","2026-02-01","2026-02-02","2026-02-17","2026-02-18","2026-03-07",
-  "2026-03-21","2026-03-22","2026-03-23","2026-05-01","2026-05-27","2026-05-31",
-  "2026-06-01","2026-06-17","2026-08-25","2026-08-31","2026-09-16","2026-11-08",
-  "2026-11-09","2026-12-11","2026-12-25",
-]);
-
-function toYMD(d){
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-function lastDayOfMonth(d){ return new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); }
-function isWeekend(d){ const w=d.getDay(); return w===0||w===6; }
-function isHoliday(d){ return PUBLIC_HOLIDAYS.has(toYMD(d)); }
-function isCutoff(d){ const last=lastDayOfMonth(d); return d.getDate()>=(last-6); }
-function isWorkingDay(d){ return !(isWeekend(d)||isHoliday(d)||isCutoff(d)); }
-function nextTueThu(fromDate){
-  let d=new Date(fromDate);
-  while(d.getDay()!==2&&d.getDay()!==4){ d=addDays(d,1); }
-  return d;
-}
-function formatETA(d){
-  return new Intl.DateTimeFormat('en-MY',{weekday:'short',day:'numeric',month:'short',year:'numeric'}).format(d);
-}
-function withFlags(base,cutFlag,holFlag){
-  let s=base;
-  if(cutFlag) s+=' *affected by cut off*';
-  if(holFlag) s+=' *affected by holiday*';
-  return s;
-}
-function computeETA(leadDays,opts={}){
-  let cutFlag=false,holFlag=false;
-  const now=new Date();
-  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const loose=!!opts.looseStart;
-  let base;
-  if(loose){ base=nextTueThu(addDays(today,1)); }
-  else { base=addDays(today,1); }
-
-  if(Number(leadDays)===0){
-    if(!loose){
-      if(isWorkingDay(today)) return {date:today,text:formatETA(today),cutFlag:false,holFlag:false};
-      let d=addDays(today,1);
-      while(!isWorkingDay(d)){ if(isCutoff(d)) cutFlag=true; if(isHoliday(d)) holFlag=true; d=addDays(d,1); }
-      return {date:d,text:withFlags(formatETA(d),cutFlag,holFlag),cutFlag,holFlag};
-    } else {
-      let d=new Date(base);
-      if(!isWorkingDay(d)){ do { if(isCutoff(d)) cutFlag=true; if(isHoliday(d)) holFlag=true; d=addDays(d,1); } while(!isWorkingDay(d)); }
-      return {date:d,text:withFlags(formatETA(d),cutFlag,holFlag),cutFlag,holFlag};
-    }
-  }
-
-  let d=new Date(base);
-  let needed=Math.max(0,parseInt(leadDays,10)||0);
-  while(needed>0){
-    if(isWorkingDay(d)){ needed-=1; if(needed===0) break; d=addDays(d,1); }
-    else { if(isCutoff(d)) cutFlag=true; if(isHoliday(d)) holFlag=true; d=addDays(d,1); }
-  }
-  return {date:d,text:withFlags(formatETA(d),cutFlag,holFlag),cutFlag,holFlag};
-}
-</script>
-
-<script>
-/* Show Results pipeline */
-let promoOnlyMode = false;
-
-function showResults(){
-  if(!csvLoaded) return;
-  const selected = getSelections();
-  const reInput = (document.getElementById("searchRE")?.value||"").trim().toLowerCase();
-  const leInput = (document.getElementById("searchLE")?.value||"").trim().toLowerCase();
-  const reHasAstig = /c-?(0\.[1-9]|[1-9])/i.test(reInput);
-  const leHasAstig = /c-?(0\.[1-9]|[1-9])/i.test(leInput);
-  let toricInput="", sphereInput="";
-  if(reHasAstig&&!leHasAstig){ toricInput=reInput; sphereInput=leInput; }
-  else if(leHasAstig&&!reHasAstig){ toricInput=leInput; sphereInput=reInput; }
-  else {
-    const reFiltered=filterProducts(selected,reInput);
-    const leFiltered=filterProducts(selected,leInput||reInput);
-    const setLE=new Set(leFiltered.map(p=>p["FULL NAME"]));
-    let overlapping=reFiltered.filter(p=>setLE.has(p["FULL NAME"]));
-    if(promoOnlyMode) overlapping=overlapping.filter(p=>(p["PROMO"]||"").trim().length>0);
-    return renderCards(overlapping);
-  }
-  const toricFiltered=filterProducts(selected,toricInput).filter(p=>(p["VISION (SPH, ASTIG, MF)"]||"").toUpperCase().includes("ASTIG"));
-  if(!toricFiltered.length){ renderCards([]); return; }
-  const productNames=new Set(toricFiltered.map(p=>(p["PRODUCT"]||"").toUpperCase()));
-  const sphereFiltered=products.filter(p=>productNames.has((p["PRODUCT"]||"").toUpperCase())&&(p["VISION (SPH, ASTIG, MF)"]||"").toUpperCase().includes("SPH"));
-  let combined=[...toricFiltered,...sphereFiltered];
-  if(promoOnlyMode) combined=combined.filter(p=>(p["PROMO"]||"").trim().length>0);
-  combined.sort((a,b)=>{
-    const prodA=(a["PRODUCT"]||"").toUpperCase();
-    const prodB=(b["PRODUCT"]||"").toUpperCase();
-    if(prodA!==prodB) return prodA.localeCompare(prodB);
-    const order={ASTIG:1,SPH:2,MF:3};
-    const vA=order[(a["VISION (SPH, ASTIG, MF)"]||"").toUpperCase()]||99;
-    const vB=order[(b["VISION (SPH, ASTIG, MF)"]||"").toUpperCase()]||99;
-    return vA-vB;
-  });
-  renderCards(combined);
-}
-
-["searchRE","searchLE"].forEach(id=>{
-  const el=document.getElementById(id);
-  el&&el.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); showResults(); } });
-});
-
-showBtn?.addEventListener("click",()=>{ promoOnlyMode=false; showResults(); });
-promoBtn?.addEventListener("click",()=>{ promoOnlyMode=true; showResults(); });
-
-sortSelect?.addEventListener("change",()=>{
-  const items=[...(window._lastResults||[])];
-  const val=sortSelect.value;
-  if(val.startsWith("price")){ const dir=val.endsWith("asc")?1:-1; items.sort((a,b)=>(getNumericPrice(a)-getNumericPrice(b))*dir); }
-  else if(val.startsWith("valuepair")){ const dir=val.endsWith("asc")?1:-1; items.sort((a,b)=>(getNumericValuePerPair(a)-getNumericValuePerPair(b))*dir); }
-  else if(val==="comfort-desc"){ items.sort((a,b)=>mapComfortRank(b["COMFORT"])-mapComfortRank(a["COMFORT"])); }
-  else if(val==="comfort-asc"){ items.sort((a,b)=>mapComfortRank(a["COMFORT"])-mapComfortRank(b["COMFORT"])); }
-  else if(val==="hours-desc"){ items.sort((a,b)=>(getWearingHours(b)??-Infinity)-(getWearingHours(a)??-Infinity)); }
-  else if(val==="hours-asc"){ items.sort((a,b)=>(getWearingHours(a)??Infinity)-(getWearingHours(b)??Infinity)); }
-  buildCards(items);
-});
-
-function renderCards(data){
-  const container=document.getElementById("cardsGrid");
-  const bar=document.getElementById("sortBar");
-  if(!container) return;
-  if(!data||!data.length){
-    container.innerHTML='<p style="color:var(--text-muted); font-size:13px; padding:12px;">No matching products found.</p>';
-    bar.style.display="none"; return;
-  }
-  bar.style.display="flex";
-  const seen=new Set();
-  const clean=data.filter(p=>{ const key=p["FULL NAME"]||""; if(seen.has(key)) return false; seen.add(key); return true; });
-  window._lastResults=clean;
-  buildCards(clean);
-}
-
-function buildCards(list){
-  const grid=document.getElementById("cardsGrid");
-  if(!grid) return;
-  const H_DISPOSE="MODALITY (1 day, 2 weeks, 1 month, 3 months)";
-  const H_PRICE="1 BOX PRICE & UNIT";
-  const H_PRICE_UNIT="PRICE 1 BOX (RM)";
-  const H_2_BOX="2 BOX";
-  const H_4_BOX="4 BOX";
-  const H_8_BOX="8 BOX";
-  const H_VALUE="VALUE_PER_PAIR";
-  const H_PROMO="PROMO";
-  const H_COMFORT="COMFORT";
-  const H_MAT="MATERIAL";
-  const H_HOURS="WEARING_HOURS";
-
-  const html=list.map((p,idx)=>{
-    const id="card_"+idx;
-    const name=p["FULL NAME"]||"";
-    const promo=(p[H_PROMO]||"").trim();
-    const hasPromo=promo.length>0;
-    const photoKey=(p["PHOTO"]||"").trim();
-    const hasPhoto=!!photoKey;
-    const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
-    const price=p[H_PRICE]||"";
-    const price_unit=p[H_PRICE_UNIT]||"";
-    const box2=p[H_2_BOX]||"";
-    const box4=p[H_4_BOX]||"";
-    const box8=p[H_8_BOX]||"";
-    const value=p[H_VALUE]||"";
-    const hoursRaw=p[H_HOURS]||"";
-    const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
-    const isLoose=/\bloose\b/i.test(name);
-    const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
-    const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
-
-    return `
-      <div id="${id}" class="pane lens-card card-compact" style="position:relative;">
-        <div style="font-weight:600; font-size:13px; color:var(--text); margin-bottom:8px;">${name}</div>
-        <div class="photo" style="margin-bottom:8px;">
-          ${hasPhoto
-            ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
-            : `<div style="width:100%;height:100px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);font-size:12px;">No photo</div>`
-          }
-          ${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}
-        </div>
-        <div style="font-size:12px; line-height:1.7; color:var(--text-mid);">
-          <div><span style="font-weight:600;">1 box has  ${price}</span></div>
-
-<div>
-  <span style="font-weight:600;">Price 1 box:</span>
-  <span style="font-weight:600;">
-  RM ${price_unit}
-  </span>
 </div>
 
-<div>
-  <span style="font-weight:600;">Price 2 boxes:</span>
 
-  <span style="font-weight:600;">
-    RM ${((price_unit * 2) - box2)}
-  </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box2}</span>
-</div>
+<div style="background-color:white; height:130px; width:90%; border-radius:30px; margin:1% auto;">
 
 <div>
-  <span style="font-weight:600;">Price 4 boxes:</span>
 
-  <span style="font-weight:600;">
-    RM ${((price_unit * 4) - box4)}
-  </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box4}</span>
-</div>
+Delta Value<input  style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
+  type="text"
+  id="sph_test"
+  value="+0.00"
+  oninput="syncDelta(this)"
+>
 
+<script>
+function syncDelta(el){
+  const val = parseFloat(el.value);
+
+  const delta = isNaN(val) ? 0 : val;
+
+  const deltaInput = document.getElementById("deltaInput");
+  deltaInput.value = delta.toFixed(2);
+
+refreshScale(true); // fires the same logic as your button
+}</script>
+
+
+  <button onclick="adj('sph_test', -0.25)">-</button>
+  <button onclick="adj('sph_test',  0.25)">+</button>
+
+
+  </div>
 <div>
-  <span style="font-weight:600;">Price 8 boxes:</span>
 
-  <span style="font-weight:600;">
-    RM ${((price_unit * 8) - box8)}
-  </span>
-  <span style="font-weight:600;color:#3A6656;">- Save RM ${box8}</span>
+  Current Sph <input style="margin-left:20px; margin-top:20px; text-align:center; width:30%; height:30px; border-radius:6px"
+    type="text"
+    id="balanceInput"
+    step="0.25"
+    value="-0.00"
+    oninput="refreshScale(false)"
+    onblur="refreshScale(true)"
+  >
+  <button type="button" onclick="adjustBalance(-0.25)">-</button>
+  <button type="button" onclick="adjustBalance(0.25)">+</button>
+
+  <button style="display:none; height:40px" onclick="refreshScale()">Current</button>
+
+
+<script>
+function adjustBalance(step){
+  const el = document.getElementById("balanceInput");
+
+  let v = parseFloat(el.value);
+  if (isNaN(v)) v = 0;
+
+  v = Math.round((v + step) * 4) / 4; // keep 0.25 steps
+
+  el.value = v.toFixed(2);
+
+refreshScale(true);
+}</script>
+
+
 </div>
-
-          <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>
-          <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
-          <div><span style="font-weight:600;">Est. Ready:</span> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
-        </div>
-      </div>`;
-  }).join("");
-
-  grid.innerHTML=html;
-  bindDefToggles(grid);
-
-  list.forEach((p,idx)=>{
-    const id="card_"+idx;
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.addEventListener('click',()=>{
-      const name=p["FULL NAME"]||"";
-      const photoKey=(p["PHOTO"]||"").trim();
-      const hasPhoto=!!photoKey;
-      const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
-      const dispose=p[H_DISPOSE]||"";
-      const price=p[H_PRICE]||"";
-      const value=p[H_VALUE]||"";
-      const comfort=p[H_COMFORT]||"";
-      const material=p[H_MAT]||"";
-      const promo=(p[H_PROMO]||"").trim();
-      const hasPromo=promo.length>0;
-      const hoursRaw=p[H_HOURS]||"";
-      const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
-      const comfortNice=niceCase(comfort);
-      const materialNice=mapMaterial(material);
-      const isLoose=/\bloose\b/i.test(name);
-      const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
-      const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
-
-      const expandedHTML=`
-        <div class="zoom-card-flex">
-          <div class="photo" style="text-align:center;">
-            ${hasPhoto
-              ? `<img src="${photoURL}" alt="${name}">`
-              : `<div style="width:100%;height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);">No photo</div>`
-            }
-          </div>
-          <div class="details">
-            <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--text); margin-bottom:6px;">${name}</div>
-            <div><b>Dispose Period:</b> ${dispose}</div>
-            <div><b>Estimated Ready:</b> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
-            <div class="def-row">
-              <b class="def-term" data-long="<strong>Premium:</strong> Enhanced coating &amp; comfort through newer and premium technology.<br><strong>Good:</strong> Medium range balancing cost and technology.<br><strong>Basic:</strong> Focuses on health and safety only.">Comfort</b>: <span>${comfortNice}</span>
-              <div class="def-extra"></div>
-            </div>
-            <div class="def-row">
-              <b class="def-term" data-long="<strong>Hydrogel:</strong> First generation material. Popular among short-hours wearers.<br><strong>Silicone Hydrogel:</strong> Modern material with embedded silicone for higher oxygen transmissibility. Better for long daily wear.">Material</b>: <span>${materialNice}</span>
-              <div class="def-extra"></div>
-            </div>
-            <div><b>Estimated wearing hours:</b> ${hours||"—"}</div>
-            <div><b>Average cost per pair:</b> ${value||"—"}</div>
-            <hr style="border:none;border-top:1px solid var(--border);margin:8px 0;">
-            <div><b>Price Per Pack & Qty:</b> ${price}</div>
-            <div><b>Current Promo:</b> <span style="color:${hasPromo?'var(--danger)':'var(--text-muted)'}">${hasPromo?promo:"Not at the moment"}</span></div>
-          </div>
-        </div>`;
-
-      if(window.__openCardZoom){
-        window.__openCardZoom(expandedHTML);
-        bindDefToggles(document.getElementById('zoomCardBox'));
-      }
-    });
-  });
-}
-</script>
-
 <script>
-/* Lightbox */
-document.addEventListener('DOMContentLoaded', function(){
-  const overlay=document.getElementById('imgZoom');
-  const cardBox=document.getElementById('zoomCardBox');
-  if(!overlay||!cardBox) return;
-  function openCard(html){ cardBox.innerHTML=html; cardBox.style.display='block'; overlay.classList.add('open'); }
-  function closeAll(){ overlay.classList.remove('open'); cardBox.innerHTML=''; cardBox.style.display='none'; }
-  overlay.addEventListener('click',(e)=>{ if(e.target===overlay) closeAll(); });
-  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'&&overlay.classList.contains('open')) closeAll(); });
-  window.__openCardZoom=openCard;
-  window.__closeZoom=closeAll;
-});
-</script>
+/* ========= BUTTON ADJ ========= */
+window.adj = function(type, step){
+  const el = document.getElementById(type);
+  if(!el) return;
 
-<script>
-/* Converter */
-(function(){
-  const CL_CYL_STEPS=[-0.75,-1.25,-1.75,-2.25,-2.75];
-  let latest={re:null,le:null};
-  function glassesToCL(F){ const d=0.009; return F/(1-d*F); }
-  function r025(x){ return Math.round(x/0.25)*0.25; }
-  function roundUp025(x){ return Math.round(x/0.25)*0.25; }
-  function fmt(x){ x=parseFloat(x)||0; const v=Math.round(x*100)/100; const s=v>=0?"+":""; return s+v.toFixed(2); }
-  function nearest(arr,val){ return arr.reduce((b,v)=>Math.abs(v-val)<Math.abs(b-val)?v:b,arr[0]); }
+  let v = parseFloat(el.value) || 0;
+  v += step;
+  el.value = v.toFixed(2);
 
-  document.querySelectorAll("#specToCL input[type=number]").forEach(inp=>{
-    inp.addEventListener("blur",()=>{
-      let v=parseFloat(inp.value);
-      if(isNaN(v)){inp.value="";return;}
-
-if(inp.id.includes("cyl")){
-  if(v > 0){
-    inp.value = "";
-    return;
-  }
-}
-
-      if(inp.id.includes("axis")){ v=Math.round(v); if(v<=0)v=180; if(v>180)v=v%180||180; inp.value=v; }
-      else { v=r025(v); inp.value=v.toFixed(2); }
-    });
-  });
-
-  function flatterAxis(a){
-    a=parseFloat(a)||0; if(a<=0) a=180;
-    const rounded=Math.round(a/10)*10;
-    const fixed=(rounded>180)?180:rounded;
-    let t1=fixed-10; let t2=fixed+10;
-    if(t1<1) t1=180+t1;
-    if(t2>180) t2=t2-180;
-return [
-  fixed === 0 ? 180 : fixed,
-  t1 === 0 ? 180 : t1,
-  t2 === 0 ? 180 : t2
-];
-  }
-
-  function roundClipDiff(x){ return Math.round(x/0.50)*0.50; }
-
-  function convertOne(S,C,A){
-    S=parseFloat(S)||0; C=parseFloat(C)||0; A=parseFloat(A)||0;
-    const total=S+C;
-    const convS=glassesToCL(S);
-    const convT=glassesToCL(total);
-    const rawCyl=convT-convS;
-    const SE=convS+rawCyl/2;
-    const rS=r025(convS);
-    const rClipC=nearest(CL_CYL_STEPS,rawCyl);
-    const [axis1,axis2]=flatterAxis(A);
-    const clipDiffRounded=roundClipDiff(rawCyl-rClipC);
-    const correctedSphere=roundUp025(rS+clipDiffRounded/2);
-    if(Math.abs(rawCyl)<0.75){ return {type:"sph",sph:roundUp025(SE),cyl:0,axis:null}; }
-    return {
-      type:"toric",
-      t1:{S:correctedSphere,C:rClipC,A:axis1},
-      t2:{S:correctedSphere,C:rClipC,A:axis2},
-      t3:{S:correctedSphere-0.25,C:rClipC+0.50,A:axis1},
-      SE:roundUp025(SE)
-    };
-  }
-
-  function display(side,data){
-    const div=document.getElementById(side==="re"?"reResult":"leResult");
-    if(!div)return;
-    if(data.type==="sph"){ div.innerHTML=`${side.toUpperCase()} Spherical : S${fmt(data.sph)}`; return; }
-const t=(t,n)=>{
-  return Math.abs(t.C) === 0.25
-    ? `${side.toUpperCase()} ${n} : S ${fmt(t.S)}`
-    : `${side.toUpperCase()} ${n} :  ${fmt(t.S)} /  ${fmt(t.C)} × ${t.A}`;
-};    const se=`${side.toUpperCase()} SE Only : ${fmt(data.SE)}`;
-    div.innerHTML=[t(data.t1,1),t(data.t2,2),t(data.t3,3),se].join("<br>");
-  }
-
-  document.getElementById("convertBtn").addEventListener("click",()=>{
-    const re=convertOne(document.getElementById("sph-re").value,document.getElementById("cyl-re").value,document.getElementById("axis-re").value);
-    const le=convertOne(document.getElementById("sph-le").value,document.getElementById("cyl-le").value,document.getElementById("axis-le").value);
-    display("re",re); display("le",le);
-    latest.re=re; latest.le=le;
-  });
-
-function autofillSet(set){
-  const reBox=document.getElementById("searchRE");
-  const leBox=document.getElementById("searchLE");
-  if(!reBox||!leBox) return;
-
-  const f=(d)=>{
-    if(!d) return "";
-
-    if(d.type==="sph")
-      return `S${fmt(d.sph)}`;
-
-if(set === "SE")
-  return `S${fmt(d.SE)}`;
-
-const sel=d[set];
-
-if(!sel)
-  return "";
-
-if(Math.abs(sel.C) === 0.25)
-  return `S${fmt(sel.S)}`;
-
-return `S${fmt(sel.S)} C${fmt(sel.C)} x${sel.A}`;
-  };
-    reBox.value=f(latest.re); leBox.value=f(latest.le);
-  }
-
-  document.getElementById("auto1").addEventListener("click",()=>autofillSet("t1"));
-  document.getElementById("auto2").addEventListener("click",()=>autofillSet("t2"));
-  document.getElementById("auto3").addEventListener("click",()=>autofillSet("t3"));
-  document.getElementById("autoSE").addEventListener("click",()=>autofillSet("SE"));
-})();
-</script>
-
-<script>
-/* Pro mode toggle */
-(function(){
-  let isProfessional=false;
-  const btn=document.getElementById('modeToggleBtn');
-  const proSelectors=['0'];
-  function setMode(){
-    proSelectors.forEach(sel=>{
-      const el=document.querySelector(sel);
-      if(!el) return;
-      if(isProfessional) el.classList.remove('simple-hide');
-      else el.classList.add('simple-hide');
-    });
-    btn.textContent=isProfessional?'See less filters':'See more filters';
-  }
-  btn.addEventListener('click',()=>{ isProfessional=!isProfessional; setMode(); });
-  setMode();
-})();
-</script>
-
-<script>
-/* Photo zoom inside lightbox */
-document.addEventListener('click', function(e){
-  const cardBox=document.getElementById('zoomCardBox');
-  if(!cardBox.contains(e.target)) return;
-  const img=e.target.closest('img');
-  if(!img) return;
-  const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10001;cursor:zoom-out;';
-  const big=img.cloneNode(true);
-  big.style.cssText='max-width:80vw;max-height:85vh;border-radius:12px;box-shadow:0 0 40px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.2);';
-  overlay.appendChild(big);
-  overlay.addEventListener('click',(ev)=>{ if(ev.target===overlay) overlay.remove(); });
-  document.body.appendChild(overlay);
-});
-</script>
-
-<script>
-/* Comparison */
-let selectedCards=[];
-function toggleCompare(cardEl,product,btn){
-  const id=product["FULL NAME"]||"";
-  const isSelected=selectedCards.find(p=>p["FULL NAME"]===id);
-  if(isSelected){
-    selectedCards=selectedCards.filter(p=>p["FULL NAME"]!==id);
-    cardEl.style.outline="";
-    btn.textContent="Compare";
-  } else {
-    if(selectedCards.length>=2) return;
-    selectedCards.push(product);
-    cardEl.style.outline="2px solid var(--accent)";
-    btn.textContent="Remove";
-  }
-  updateCompareView();
-}
-function updateCompareView(){
-  const compBox=document.getElementById("compareBox")||createCompareBox();
-  if(selectedCards.length!==2){ compBox.style.display="none"; return; }
-  const [a,b]=selectedCards;
-  const priceA=a["1 BOX PRICE & UNIT"]||"—";
-  const priceB=b["1 BOX PRICE & UNIT"]||"—";
-  const hrsA=a["WEARING_HOURS"]?`${parseFloat(a["WEARING_HOURS"])} hrs`:"—";
-  const hrsB=b["WEARING_HOURS"]?`${parseFloat(b["WEARING_HOURS"])} hrs`:"—";
-  const typeA=a["VISION (SPH, ASTIG, MF)"]||"—";
-  const typeB=b["VISION (SPH, ASTIG, MF)"]||"—";
-  const isLooseA=/\bloose\b/i.test(a["FULL NAME"]||"");
-  const isLooseB=/\bloose\b/i.test(b["FULL NAME"]||"");
-  const leadA=parseInt(a["LEAD_TIME"]||"3",10);
-  const leadB=parseInt(b["LEAD_TIME"]||"3",10);
-  const etaA=computeETA(leadA,{looseStart:isLooseA}).text;
-  const etaB=computeETA(leadB,{looseStart:isLooseB}).text;
-  compBox.innerHTML=`
-    <h3 style="margin:0 0 12px; font-family:var(--font-display);">Comparison</h3>
-    <table>
-      <tr><th>Field</th><th>${a["FULL NAME"]}</th><th>${b["FULL NAME"]}</th></tr>
-      <tr><td><b>Price</b></td><td>${priceA}</td><td>${priceB}</td></tr>
-      <tr><td><b>Wearing Hours</b></td><td>${hrsA}</td><td>${hrsB}</td></tr>
-      <tr><td><b>Est. Ready</b></td><td>${etaA}</td><td>${etaB}</td></tr>
-      <tr><td><b>Type</b></td><td>${typeA}</td><td>${typeB}</td></tr>
-    </table>
-    <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px;">
-      Click <strong>Remove</strong> on either lens to clear comparison.
-    </p>`;
-  compBox.style.display="block";
-}
-function createCompareBox(){
-  const box=document.createElement("div");
-  box.id="compareBox";
-  box.style.display="none";
-  document.getElementById("compareArea").appendChild(box);
-  return box;
-}
-const oldBuildCards=buildCards;
-buildCards=function(list){
-  oldBuildCards(list);
-  list.forEach((p,idx)=>{
-    const card=document.getElementById("card_"+idx);
-    if(!card) return;
-    const btn=document.createElement("button");
-    btn.textContent="Compare";
-    btn.className="btn-outline";
-    btn.style.marginTop="8px";
-    btn.style.fontSize="11px";
-    btn.addEventListener("click",(e)=>{ e.stopPropagation(); toggleCompare(card,p,btn); });
-    card.appendChild(btn);
-  });
+  el.dispatchEvent(new Event('input',{bubbles:true}));
 };
+
+/* ========= ELEMENTS ========= */
+const redImg  = document.getElementById('redImg');
+const blueImg = document.getElementById('blueImg');
+const sphInput = document.getElementById('sph_test');
+
+/* ========= CONSTANTS ========= */
+const K_BLUR_PER_D = 8;
+
+/* ========= STATE ========= */
+function recompute(){
+  const sph = parseFloat(sphInput.value) || 0;
+
+  render(sph);
+}
+
+function render(sph){
+  const s = Math.abs(sph);
+
+  const primary = s * K_BLUR_PER_D;
+  const secondary = (s >= 0.75) ? ((s - 0.5) * K_BLUR_PER_D) : 0;
+
+  let blurRed = 0;
+  let blurBlue = 0;
+
+  if(sph > 0){
+    blurRed  = primary;
+    blurBlue = secondary;
+  } else if(sph < 0){
+    blurBlue = primary;
+    blurRed  = secondary;
+  }
+
+  redImg.style.filter  = `blur(${blurRed.toFixed(2)}px)`;
+  blueImg.style.filter = `blur(${blurBlue.toFixed(2)}px)`;
+}
+
+/* ========= EVENTS ========= */
+sphInput.addEventListener('input', recompute);
+
+/* ========= INIT ========= */
+recompute();
 </script>
 
+
+
+</div>
+
+
+
+
+
+<div style="text-align:center; margin:0px auto 0 auto; font-family:arial; width:95%;">
+
+  <div style="display:flex; gap:15px; align-items:center; justify-content:center;">
+
+    <div style="display:none">
+      <input style="text-align:center; width:50%; height:30px; border-radius:6px" type="number" id="deltaInput" step="0.25" value="0.00">
+      <button style="height:40px" onclick="refreshScale()">To balance</button>
+    </div>
+  </div>
+
+<div style="height:10px"></div>
+
+  <div style="width:95%; margin:0 auto;">
+      <img src="https://sp-rx.github.io/trainer_light/DCSCALE.jpg"
+           style="width:100%; display:block; border-radius:30px;">
+  </div>
+
+
+<div style="width:80%; margin:0 auto;">
+ <!-- TICKS -->
+  <div id="tickRow"
+       style="display:flex; justify-content:space-between; margin-top:-95px">
+  </div>
+
+  <!-- NUMBERS -->
+  <div id="numberRow"
+       style="display:flex; justify-content:space-between; margin-top:5px; font-size:13px;">
+  </div>
+
+  <!-- CURRENT ARROW -->
+  <div id="arrowRow"
+       style="display:flex; justify-content:space-between; margin-top:5px; height:40px; font-size:13px;">
+  </div>
+
+</div>
+</div>
+
+<div style="height:20px"></div>
+
+
+
+
+
 <script>
-/* WhatsApp messaging */
-document.addEventListener("DOMContentLoaded",()=>{
-  const numberInput=document.getElementById("waNumber");
-  numberInput.addEventListener("input",updateCountryDisplay);
+let numbers = [];
+
+function snap(input) {
+    let v = parseFloat(input.value);
+    if (isNaN(v)) v = 0;
+    v = Math.round(v * 4) / 4;
+    input.value = v.toFixed(2);
+}
+
+function formatPower(v) {
+    if (v === "Outside") return "Outside";
+    let num = parseFloat(v);
+    if (num > 0) return "+" + num.toFixed(2);
+    return num.toFixed(2);
+}
+
+// SINGLE FUNCTION TO UPDATE EVERYTHING
+function refreshScale(doSnap = false) {
+
+    if (doSnap) {
+        snap(document.getElementById("balanceInput"));
+        snap(document.getElementById("deltaInput"));
+    }
+
+    const current = parseFloat(document.getElementById("balanceInput").value);
+    const delta = parseFloat(document.getElementById("deltaInput").value);
+
+    // Balance = middle of scale
+    const balance = current + delta;
+
+    const range = 1.00;
+    const step = 0.25;
+
+    numbers = [];
+
+    const leftEnd = balance + range;
+    const rightEnd = balance - range;
+
+    for (let v = leftEnd; v > balance; v -= step)
+        numbers.push(v.toFixed(2));
+
+    numbers.push(balance.toFixed(2));
+
+    for (let v = balance - step; v >= rightEnd; v -= step)
+        numbers.push(v.toFixed(2));
+
+    numbers.unshift("Outside");
+    numbers.push("Outside");
+
+    const tickRow = document.getElementById("tickRow");
+    const numberRow = document.getElementById("numberRow");
+    const arrowRow = document.getElementById("arrowRow");
+
+    tickRow.innerHTML = "";
+    numberRow.innerHTML = "";
+    arrowRow.innerHTML = "";
+
+    // DRAW TICKS & NUMBERS
+    numbers.forEach((n) => {
+        // tick
+        const tickSlot = document.createElement("div");
+        tickSlot.style.flex = "1";
+        tickSlot.style.textAlign = "center";
+
+        const tick = document.createElement("div");
+        tick.style.width = "2px";
+        tick.style.height = "14px";
+        tick.style.background = "black";
+        tick.style.margin = "0 auto";
+        tickSlot.appendChild(tick);
+
+        tickRow.appendChild(tickSlot);
+
+        // number
+        const numberSlot = document.createElement("div");
+        numberSlot.style.flex = "1";
+        numberSlot.style.textAlign = "center";
+        numberSlot.innerText = formatPower(n);
+
+        numberRow.appendChild(numberSlot);
+    });
+
+    // DRAW ARROW AT CURRENT
+    const numericIndexes = numbers
+        .map((v,i) => isNaN(parseFloat(v)) ? null : i)
+        .filter(v => v !== null);
+
+    let index;
+
+    if (current > parseFloat(numbers[numericIndexes[0]]))
+        index = 0;
+    else if (current < parseFloat(numbers[numericIndexes[numericIndexes.length-1]]))
+        index = numbers.length - 1;
+    else {
+        index = numericIndexes.reduce((prev,curr) =>
+            Math.abs(parseFloat(numbers[curr]) - current) <
+            Math.abs(parseFloat(numbers[prev]) - current)
+            ? curr : prev
+        , numericIndexes[0]);
+    }
+
+    for (let i = 0; i < numbers.length; i++) {
+        const slot = document.createElement("div");
+        slot.style.flex = "1";
+        slot.style.textAlign = "center";
+
+        if (i === index) {
+            const arrow = document.createElement("div");
+            arrow.style.width = "0";
+            arrow.style.height = "0";
+            arrow.style.borderLeft = "7px solid transparent";
+            arrow.style.borderRight = "7px solid transparent";
+            arrow.style.borderBottom = "14px solid black";
+            arrow.style.margin = "0 auto 4px auto";
+            slot.appendChild(arrow);
+
+            const label = document.createElement("div");
+            label.innerText = formatPower(current) + " (Current)";
+            slot.appendChild(label);
+        }
+
+        arrowRow.appendChild(slot);
+    }
+}
+
+refreshScale(true);
+</script>
+
+
+
+</div>
+</div>
+
+  
+</td></tr>
+
+
+</table>
+
+
+
+<table>
+
+
+<tr>
+<td align="center" style="text-align:center;">
+<div class="section" style="margin-top:100px">
+
+  <div id="page-wrapper">
+
+    <span><b>Astigmatism Delta</b></span>
+<div style="margin-top:1%"></div>
+<button 
+  id="balancedButtonFC"
+  type="button"
+  style="height:30px; width:50%;"
+  onclick="toggleBalancedFC()"
+>
+  Show / Hide Example of Balanced Astigmatism Chart
+</button>
+
+<script>
+function toggleBalancedFC() {
+  const balancedFC = document.querySelector(".balancedFC");
+  const button = document.querySelector("#balancedButtonFC");
+
+  const isHidden = getComputedStyle(balancedFC).display === "none";
+
+  if (isHidden) {
+    balancedFC.style.display = "flex";
+    button.classList.add("active");
+  } else {
+    balancedFC.style.display = "none";
+    button.classList.remove("active");
+  }
+}
+</script>
+
+
+
+
+<div 
+  class="balancedFC" 
+  style="display:none; background-color:#ebebeb; width:90%; border-radius:50px; margin:2% auto; flex-direction:column; justify-content:center; align-items:center;"
+>
+
+
+<div><span style="color:darkred"><br><b>Example of a Balanced Astigmatism Chart</b></span></div>
+
+          <div style="margin-top:10px" id="fan-wrapper-bal">
+            <canvas id="fan-container-balance"></canvas>
+          </div>
+</div>
+
+
+<div style="background-color:#ebebeb; width:90%; border-radius:50px; margin:2% auto; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+
+
+<div><span><br><b>Your Current Astigmatism Chart</b></span></div>
+
+          <div style="margin-top:10px" id="fan-wrapper">
+
+
+            <canvas id="fan-container"></canvas>
+          </div>
+
+</div>
+
+    <div style="margin-top:10px"></div>
+
+    <div style="display:none;" class="toggle-button" onclick="toggleDiv(this)">
+      Show / Hide
+    </div>
+
+    <div class="toggle-content">
+
+
+
+      <div style="display:none; margin-top:20px" class="header">
+        <button class="reso-btn" onclick="setMode('pc', this)">Normal Reso</button>
+        <button class="reso-btn" onclick="setMode('ipad', this)">Higher Reso</button>
+        <button id="fogBtn" onclick="toggleFogging()">No Blur</button>
+      </div>
+
+      <div id="container">
+
+        <div id="left-controls">
+          <div>
+<span style="color:darkred; font-size:18px;">●</span>
+<b style="margin:0 8px;">Line</b>
+<span style="color:darkred; font-size:18px;">●</span>
+
+            <button style="margin-left:20px" onclick="changeCyl(-0.25)">Darken</button>
+            <button onclick="changeCyl(0.25)">Lighten</button>
+            <button style="margin-left:20px" onclick="rotateFan(-15)"><<</button>
+            <button onclick="rotateFan(15)">>></button>
+
+
+          </div>
+<div style="margin-top:15px;">
+ <span ><b>CYL Value <span style="color:darkblue" id="cylVal">0.00</span></b> </span>
+</div>
+
+
+
+
+
+        </div> <!-- left-controls -->
+
+      </div> <!-- container -->
+
+    </div> <!-- toggle-content -->
+
+  </div> <!-- page-wrapper -->
+
+</div> <!-- section -->
+
+
+</td></tr>
+
+
+</div>
+
+
+
+
+
+
+<tr><td>
+
+<div class="section" style="display:none; margin-top:20px">
+
+<div style="text-align:center; margin-bottom:15px;">
+<div>
+  <span style="font-size:25px"><b>Astigmatism Analysis & Explanation</b></span>
+</div>
+
+<div style="margin-top:10px"></div>
+
+<div class="toggle-button" onclick="toggleDiv(this)">Show / Hide</div>
+
+<div class="toggle-content" style="display:none">
+
+
+<div style="margin-top:20px"></div>
+<span style="font-size:25px"><b>Astig Notes</b></span>
+
+<div style="display:flex; align-items:center; justify-content:center; margin-bottom:15px; gap:10px;">
+  <label for="astigBothEye" style="width:100px; text-align:right;"><b>Both Eye:</b></label>
+  <textarea placeholder="RX to Balance, Additional Notes, Current RX.." 
+    id="astigBothEye" rows="3"
+    style="flex:1; font-size:15px; border:0px solid #000; padding:5px; border-radius:5px;"></textarea>
+</div>
+
+<div style="display:flex; align-items:center; justify-content:center; margin-bottom:15px; gap:10px;">
+  <label for="astigRightEye" style="width:100px; text-align:right;"><b>Right Eye:</b></label>
+  <textarea placeholder="RX to Balance, Additional Notes, Current RX.." 
+    id="astigRightEye" rows="3"
+    style="flex:1; font-size:15px; border:0px solid #000; padding:5px; border-radius:5px;"></textarea>
+</div>
+
+<div style="display:flex; align-items:center; justify-content:center; margin-bottom:15px; gap:10px;">
+  <label for="astigLeftEye" style="width:100px; text-align:right;"><b>Left Eye:</b></label>
+  <textarea placeholder="RX to Balance, Additional Notes, Current RX.." 
+    id="astigLeftEye" rows="3"
+    style="flex:1; font-size:15px; border:0px solid #000; padding:5px; border-radius:5px;"></textarea>
+</div>
+
+
+
+<div style="margin-top:40px" >
+
+
+<span style="font-size:20">
+  - <b>Mirror from above 
+    <span style="color:darkred" id="cylMirror">0.00</span>
+  </b> -
+</span><br><br>
+
+  <span style="font-size:25px"><b>Astigmatism condition <span>- </span> <span id="astigCylVal">0.00</span> <span> x </span> <span id="astigAxisVal">180</span></b></span>
+</div>
+
+<br>
+
+
+
+<div id="astig-container" style="display:flex; justify-content:center; align-items:center; gap:20px;">
+
+  <!-- Left Controls: INCREASE (+) -->
+  <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
+    <b>Astigmatism</b>
+    <button onclick="adjCyl(-0.25)" class="btn-plus">Lower</button>
+
+    <br><b>Rotate</b>
+    <button onclick="adjAxis(-45)" class="btn-plus"><<<</button>
+    <button onclick="adjAxis(-15)" class="btn-plus"><<</button>
+    <button onclick="adjAxis(-5)" class="btn-plus"><</button>
+<br>
+
+    <button onclick="adjustLetterSize(50)" class="btn-plus">Bigger Size</button>
+  <button style="display:none" onclick="setBlurMode(10)">Far-Sighted</button>
+
+  </div>
+
+  <!-- Center Canvas -->
+  <canvas id="astigCanvas" width="500" height="600"
+    style="background:#fff; border:1px solid #ccc; border-radius:50px;">
+  </canvas>
+
+  <!-- Right Controls: DECREASE (−) -->
+  <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
+    <b>Astigmatism</b>
+    <button onclick="adjCyl(0.25)" class="btn-minus">Higher</button>
+
+    <br><b>Rotate</b>
+    <button onclick="adjAxis(45)" class="btn-plus">>>></button>
+    <button onclick="adjAxis(15)" class="btn-plus">>></button>
+    <button onclick="adjAxis(5)" class="btn-minus">></button>
+<br>
+
+    <button onclick="adjustLetterSize(-50)" class="btn-minus">Smaller Size</button>
+  <button style="display:none" onclick="setBlurMode(5)">Near-Sighted</button>
+
+  </div>
+
+</div>
+
+
+<script>
+const aCanvas = document.getElementById("astigCanvas");
+const aCtx = aCanvas.getContext("2d");
+
+let cyl = 0.00;
+let axis = 180;
+let letterSize = 250; // starting font size
+let blurMultiplier = 5; // default
+
+
+const cylDisplay = document.getElementById("astigCylVal");
+const axisDisplay = document.getElementById("astigAxisVal");
+
+/* ===== Directional Blur ===== */
+function directionalBlur(imageData, angle, strength) {
+    const w = imageData.width;
+    const h = imageData.height;
+    const src = imageData.data;
+    const output = aCtx.createImageData(w, h);
+    const dst = output.data;
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+const radius = Math.floor(strength);
+if (radius <= 0) return imageData;
+
+    for (let y=0;y<h;y++){
+        for(let x=0;x<w;x++){
+            let r=0,g=0,b=0,a=0,count=0;
+            for(let i=-radius;i<=radius;i++){
+                let sx = Math.round(x+dx*i);
+                let sy = Math.round(y+dy*i);
+                if(sx>=0 && sx<w && sy>=0 && sy<h){
+                    let idx = (sy*w+sx)*4;
+                    r+=src[idx]; g+=src[idx+1]; b+=src[idx+2]; a+=src[idx+3];
+                    count++;
+                }
+            }
+            let di = (y*w+x)*4;
+            dst[di]=r/count; dst[di+1]=g/count; dst[di+2]=b/count; dst[di+3]=a/count;
+        }
+    }
+    return output;
+}
+
+/* ===== Text Wrapping ===== */
+function wrapText(text, x, y, maxWidth, lineHeight){
+    const words = text.split(" ");
+    let line = "";
+    for(let n=0;n<words.length;n++){
+        let testLine = line + words[n] + " ";
+        let metrics = aCtx.measureText(testLine);
+        if(metrics.width>maxWidth && n>0){
+            aCtx.fillText(line,x,y);
+            line=words[n]+" ";
+            y+=lineHeight;
+        } else line=testLine;
+    }
+    aCtx.fillText(line,x,y);
+}
+
+/* ===== Controls ===== */
+function adjCyl(step){ cyl = Math.max(0, Math.min(3, cyl+step)); drawAstig(); }
+function adjAxis(step){ axis=(axis+step+180)%180; drawAstig(); }
+function adjustLetterSize(delta){ letterSize=Math.max(20,letterSize+delta); drawAstig(); }
+
+/* ===== Main Draw ===== */
+function drawAstig(){
+    aCtx.clearRect(0,0,aCanvas.width,aCanvas.height);
+
+    // Paragraph (scales with letter size)
+    const para = "Astigmatism occurs when the eye is uneven, causing light to defocus for some area.";
+    const paraSize = Math.max(15, Math.floor(letterSize/5));
+    aCtx.font = `${paraSize}px Arial`;
+    aCtx.fillStyle="black";
+    aCtx.textAlign="center";
+    aCtx.textBaseline="top";
+    wrapText(para, aCanvas.width/2, 50, 450, paraSize+5);
+
+    // Apply blur
+    const imgData = aCtx.getImageData(0,0,aCanvas.width,aCanvas.height);
+const blurred = directionalBlur(
+    imgData,
+    (axis+90)*Math.PI/180,
+    cyl * blurMultiplier
+);
+    aCtx.putImageData(blurred,0,0);
+
+    // Update display
+cylDisplay.textContent = (cyl).toFixed(2);
+    axisDisplay.textContent = axis;
+}
+
+function setBlurMode(value){
+    blurMultiplier = value;
+    drawAstig();
+}
+
+drawAstig();
+</script>
+
+
+
+
+</td></tr>
+
+
+
+
+</div>
+
+<tr style="height:500px"><td>
+</table>
+
+
+</div>
+
+
+
+
+
+<script>
+function selectDC(val){
+  const dcHint = document.getElementById("dcHint");
+
+  switch(val){
+    case 1:
+      dcHint.textContent = "- 0.50";
+      dcHint.style.color = "darkred";
+      break;
+    case 2:
+      dcHint.textContent = "- 0.25";
+      dcHint.style.color = "darkred";
+      break;
+    case 3:
+      dcHint.textContent = "+ 0.25";
+      dcHint.style.color = "darkblue";
+      break;
+    case 4:
+      dcHint.textContent = "+ 0.50";
+      dcHint.style.color = "darkblue";
+      break;
+    case 5:
+      dcHint.textContent = "0.00";
+      dcHint.style.color = "#404040";
+      break;
+    case 6:
+      dcHint.textContent = "Requires Astig Test";
+      dcHint.style.color = "#404040";
+      break;
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+const canvas = document.getElementById('fan-container');
+const ctx = canvas.getContext('2d');
+
+/* ===== State ===== */
+let cylBlur = 0.00;
+let fogOn = false;
+let fogStrength = 0.75;
+let angle = 0;
+let deviceMode = 'ipad'; // default
+
+
+
+const cylVal = document.getElementById('cylVal');
+const fogBtn = document.getElementById('fogBtn');
+const cylMirror = document.getElementById('cylMirror');
+
+/* ===== Display ===== */
+function updateCylDisplay() {
+  let axis = angle % 180;
+  if (axis === 0) axis = 180;
+
+  // Mapping: every 15° step
+  const clockMap = {
+    0: "9 ‑ 3",
+    15: "9:30 ‑ 3:30",
+    30: "10 ‑ 4",
+    45: "10:30 ‑ 4:30",
+    60: "11 ‑ 5",
+    75: "11:30 ‑ 5:30",
+    90: "12 ‑ 6",
+    105: "12:30 ‑ 6:30",
+    120: "1 ‑ 7",
+    135: "1:30 ‑ 7:30",
+    150: "2 ‑ 8",
+    165: "2:30 ‑ 8:30",
+    180: "9 ‑ 3"
+  };
+
+  // Find nearest step
+  let step = Math.round(axis / 15) * 15;
+  if(step > 180) step = 180;
+
+  const description = clockMap[step];
+
+const powerPart = `-${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
+
+let minusAxis = axis + 90;
+if (minusAxis > 180) minusAxis -= 180;
+
+const minusPowerPart = `+${cylBlur.toFixed(2)} × ${minusAxis.toString().padStart(3,'0')}`;
+
+const fullText = `
+    <span style="color:#404040;">${description} Delta</span>
+<br>
+  <span style="color:darkred;">${powerPart}</span>
+  <span style="color:#404040;">&nbsp;&nbsp;or&nbsp;&nbsp;</span>
+  <span style="color:#1C5561;">${minusPowerPart}</span>
+`;
+
+// Original (with description)
+cylVal.innerHTML = fullText;
+
+// Mirror (without description)
+cylMirror.innerHTML = powerPart;
+}
+
+updateCylDisplay();
+
+
+
+/* ===== Controls ===== */
+function toggleFogging() {
+  fogOn = !fogOn;
+  fogBtn.textContent = fogOn ? 'Blur ON' : 'No Blur' ;
+  drawFan();
+}
+
+function changeCyl(delta) {
+  cylBlur = Math.max(0, +(cylBlur + delta).toFixed(2));
+  updateCylDisplay();
+  drawFan();
+}
+
+function rotateFan(delta){
+  angle = (angle + delta) % 180;
+  if (angle < 0) angle += 180; // ensure positive
+  updateCylDisplay();
+  drawFan();
+}
+
+function setMode(mode, el){
+  deviceMode = mode;
+
+  // remove active from all
+  document.querySelectorAll(".reso-btn")
+    .forEach(b => b.classList.remove("active"));
+
+  // activate clicked
+  el.classList.add("active");
+
+  drawFan();
+}
+
+function setupCanvas(canvas, ctx) {
+  const dpr = window.devicePixelRatio || 1;
+
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+
+function drawFan() {
+const rect = canvas.getBoundingClientRect();
+const cw = rect.width;
+const ch = rect.height;
+const cx = cw / 2;
+const cy = ch / 2;
+
+  const outerR = cw * 0.29;
+  const innerR = cw * 0.075;
+  const lineLen = cw * 0.25;
+  const dotOffset = cw * 0.275;
+  const fanAngles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
+  const maxBlur = deviceMode === 'ipad' ? 2.5 : 1.5;
+  const totalShades = 12; // number of incremental layers
+  
+  ctx.clearRect(0, 0, cw, ch);
+
+  /* Outer white circle */
+  ctx.beginPath();
+  ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  function diff180(a, b) {
+    let d = (a - b + 180) % 180;
+    return Math.min(d, 180 - d);
+  }
+
+  fanAngles.forEach(a => {
+    const rel = diff180(a, angle);
+    const effectiveRel = Math.min(rel, 90);
+    const basePower = deviceMode === 'ipad' ? 1 : 1;   // shape at low cyl
+    const cylInfluence = 0.35;       // how much cyl affects curve
+
+
+
+const dynamicPower = basePower - (cylBlur * cylInfluence);
+const t = effectiveRel / 90;
+
+const rawBlur = Math.min(
+  Math.pow(t, Math.max(0.2, dynamicPower)) * (cylBlur * 2.5)
+  + (fogOn ? fogStrength : 0),
+  maxBlur
+);
+
+const NONLINEAR_EXP = 1;  // <1 = compress high values, >1 = exaggerate
+const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
+
+
+for (let i = 0; i < totalShades; i++) {
+  ctx.save();
+  ctx.rotate(a * Math.PI / 180);
+
+  const offset = (i - (totalShades - 1) / 2) * shadeOffset;
+
+  // Spread fraction based on index, not offset
+  const spreadFraction = Math.abs(i - (totalShades - 1) / 2) / ((totalShades - 1) / 2);
+
+  // line width decreases from center to edges
+const maxLineWidth = cw * 0.004;
+const minLineWidth = cw * 0.006;
+  ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
+
+  const baseColor = 0;
+  const maxColor = deviceMode === 'ipad' ? 160 : 120;
+
+  const val = Math.round(baseColor + shadeOffset * (maxColor - baseColor));
+  ctx.strokeStyle = `rgba(${val},${val},${val},${1.1 / totalShades})`;
+
+
+
+  ctx.beginPath();
+  ctx.moveTo(offset, -lineLen);
+  ctx.lineTo(offset, lineLen);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+
+  });
+
+  ctx.restore();
+
+  /* Axis dots */
+  [0, 180].forEach(a => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((a + angle + 90) * Math.PI / 180);
+
+    ctx.beginPath();
+const dotRadius = cw * 0.008;
+ctx.arc(0, -dotOffset, dotRadius, 0, Math.PI * 2);
+    ctx.fillStyle = 'darkred';
+    ctx.fill();
+
+    ctx.restore();
+  });
+
+/* Green opposite axis dots */
+[90, 270].forEach(a => {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate((a + angle + 90) * Math.PI / 180);
+
+  ctx.beginPath();
+  const dotRadius = cw * 0.008;
+  ctx.arc(0, -dotOffset, dotRadius, 0, Math.PI * 2);
+  ctx.fillStyle = '#1C5561';
+  ctx.fill();
+
+  ctx.restore();
 });
 
-let history=[], redoStack=[];
-function saveState(){ const msg=document.getElementById("waMessage").value; history.push(msg); if(history.length>30) history.shift(); redoStack=[]; }
-function addPreset(text){ const box=document.getElementById("waMessage"); let current=box.value.trim(); saveState(); box.value=!current?text:`${current}\n\n${text}`; }
-function addPersonalPreset(){ const nameInput=document.getElementById("waName").value.trim(); const name=capitalizeName(nameInput)||"there"; addPreset(`Greetings from Kiara Optometry! Thank you for dropping by ${name}.`); }
-function addSet(setName){
-  const sets={ A:{label:"Set A - Vita Monthly Sph + 1 bottle Opti-free Puremoist 300ml",price:190}, B:{label:"Set B - Vita Monthly Astig + 1 bottle Opti-free Puremoist 300ml",price:220}, C:{label:"Set C - Oasys Biweekly Sph + 1 bottle Opti-free Puremoist 300ml",price:280}, D:{label:"Set D - Oasys Biweekly Astig + 1 bottle Opti-free Puremoist 300ml",price:350} };
-  const box=document.getElementById("waMessage"); const current=box.value.trim(); const set=sets[setName]; if(!set) return;
-  const newLine=current?"\n":""; box.value=`${current}${newLine}${set.label} - RM${set.price}`;
+  /* Center white circle */
+  ctx.beginPath();
+  ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+  ctx.fillStyle = 'white';
+  ctx.fill();
 }
-function totalUp(){
-  const box=document.getElementById("waMessage"); const text=box.value;
-  const prices={A:190,B:220,C:280,D:350};
-  const matches=text.match(/Set ([A-D])/g)||[];
-  let grandTotal=0; matches.forEach(m=>{ const set=m.split(" ")[1]; if(prices[set]) grandTotal+=prices[set]; });
-  if(grandTotal>0) addPreset(`Grand Total: RM ${grandTotal}`);
-  else alert("No sets selected yet.");
-}
-function undoMsg(){ if(!history.length) return; const box=document.getElementById("waMessage"); redoStack.push(box.value); box.value=history.pop()||""; }
-function redoMsg(){ if(!redoStack.length) return; const box=document.getElementById("waMessage"); history.push(box.value); box.value=redoStack.pop(); }
-function capitalizeName(name){ name=name.trim(); if(!name) return ""; return name.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" "); }
 
-function detectCountry(num){
-  const countries=[
-    {code:"60",name:"Malaysia"},{code:"65",name:"Singapore"},{code:"62",name:"Indonesia"},{code:"63",name:"Philippines"},{code:"66",name:"Thailand"},{code:"84",name:"Vietnam"},{code:"673",name:"Brunei"},{code:"95",name:"Myanmar"},{code:"856",name:"Laos"},
-    {code:"81",name:"Japan"},{code:"82",name:"South Korea"},{code:"86",name:"China"},{code:"852",name:"Hong Kong"},{code:"853",name:"Macau"},{code:"886",name:"Taiwan"},
-    {code:"91",name:"India"},{code:"92",name:"Pakistan"},{code:"94",name:"Sri Lanka"},{code:"880",name:"Bangladesh"},{code:"977",name:"Nepal"},
-    {code:"61",name:"Australia"},{code:"64",name:"New Zealand"},
-    {code:"971",name:"UAE"},{code:"966",name:"Saudi Arabia"},{code:"965",name:"Kuwait"},{code:"968",name:"Oman"},{code:"973",name:"Bahrain"},{code:"974",name:"Qatar"},{code:"962",name:"Jordan"},
-    {code:"27",name:"South Africa"},{code:"234",name:"Nigeria"},{code:"254",name:"Kenya"},{code:"20",name:"Egypt"},
-    {code:"44",name:"United Kingdom"},{code:"33",name:"France"},{code:"49",name:"Germany"},{code:"34",name:"Spain"},{code:"39",name:"Italy"},{code:"31",name:"Netherlands"},{code:"1",name:"United States / Canada"},{code:"55",name:"Brazil"},
-  ];
-  num=num.trim().replace(/[^\d+]/g,""); if(num.startsWith("+")) num=num.slice(1);
-  const match=countries.find(c=>num.startsWith(c.code));
-  if(!num) return {name:"Enter number"};
-  return match||{name:"Unknown Country"};
-}
-function updateCountryDisplay(){ const num=document.getElementById("waNumber").value; const info=detectCountry(num); document.getElementById("countryDisplay").textContent=info.name; }
-function formatPhone(num){ num=num.trim(); if(num.startsWith("+")) num=num.slice(1); num=num.replace(/[^\d]/g,""); if(num.startsWith("0")) return "6"+num; return num; }
-function openWhatsApp(){
-  let name=document.getElementById("waName").value.trim(); let num=document.getElementById("waNumber").value.trim(); const msg=document.getElementById("waMessage").value.trim();
-  if(!num) return alert("Please enter a phone number");
-  name=capitalizeName(name); document.getElementById("waName").value=name;
-  num=formatPhone(num); document.getElementById("waNumber").value=num;
-  window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`,"_blank");
-}
+setupCanvas(canvas, ctx);
+drawFan();
+
 </script>
+
+
+
 
 <script>
-/* RX Adjust */
-function adjustSingle(eye,type,value){
-  const id=eye+type.charAt(0).toUpperCase()+type.slice(1);
-  const field=document.getElementById(id);
-  if(type==="axis"){ let newVal=parseInt(field.value)+value; if(newVal<=0) newVal+=180; if(newVal>180) newVal-=180; field.value=newVal===0?180:newVal; }
-  else { field.value=(parseFloat(field.value)+value).toFixed(2); }
+function toggleDiv(btn) {
+  // Find the next sibling with class "toggle-content"
+  const content = btn.nextElementSibling;
+  if (!content || !content.classList.contains("toggle-content")) return;
+
+  if (content.style.display === "none") {
+    content.style.display = "block";
+  } else {
+    content.style.display = "none";
+  }
 }
-function addRxToMessage(){
-  const rSph=parseFloat(document.getElementById("rSph").value).toFixed(2);
-  const rCylVal=parseFloat(document.getElementById("rCyl").value).toFixed(2);
-  const lSph=parseFloat(document.getElementById("lSph").value).toFixed(2);
-  const lCylVal=parseFloat(document.getElementById("lCyl").value).toFixed(2);
-  let rAxis=parseInt(document.getElementById("rAxis").value);
-  let lAxis=parseInt(document.getElementById("lAxis").value);
-  if(rCylVal==0) rAxis="-"; else if(rAxis===0) rAxis=180;
-  if(lCylVal==0) lAxis="-"; else if(lAxis===0) lAxis=180;
-  const rCyl=rCylVal==0?"-":rCylVal; const lCyl=lCylVal==0?"-":lCylVal;
-  addPreset(`R :  ${rSph} /  ${rCyl} × ${rAxis}\nL :  ${lSph} /  ${lCyl} × ${lAxis}`);
-}
-function clearRx(){ ["rSph","rCyl","rAxis","lSph","lCyl","lAxis"].forEach(id=>document.getElementById(id).value=id.includes("Axis")?0:"0.00"); }
 </script>
 
-<script>
-/* Reset */
-document.getElementById('resetBtn')?.addEventListener('click',()=>location.reload());
-/* toggleSpan */
-function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; el.style.display=(el.style.display==="none")?"block":"none"; }
-</script>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+</div>
 
 </body>
+
+
 </html>
