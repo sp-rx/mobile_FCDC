@@ -276,6 +276,51 @@
   color: white;
 }
 
+
+/* DARK GREY SLIDERS */
+#cylSlider,
+#fanRotationSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 150px;
+  height: 5px;
+  border-radius: 3px;
+  background: #d0d0d0;
+  outline: none;
+  cursor: pointer;
+}
+
+/* SLIDER THUMB — CHROME / EDGE */
+#cylSlider::-webkit-slider-thumb,
+#fanRotationSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #444444;
+  border: none;
+  cursor: grab;
+}
+
+/* SLIDER THUMB — FIREFOX */
+#cylSlider::-moz-range-thumb,
+#fanRotationSlider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #444444;
+  border: none;
+  cursor: grab;
+}
+
+/* HOVER */
+#cylSlider::-webkit-slider-thumb:hover,
+#fanRotationSlider::-webkit-slider-thumb:hover {
+  background: #292929;
+}
+
+
 </style>
 </head>
 
@@ -862,19 +907,98 @@ function toggleBalancedFC() {
 <b style="margin:0 8px;">Line</b>
 <span style="color:darkred; font-size:18px;">●</span>
 
-            <button style="margin-left:20px" onclick="changeCyl(-0.25)">Darken</button>
-            <button onclick="changeCyl(0.25)">Lighten</button>
-            <button style="margin-left:20px" onclick="rotateFan(-15)"><<</button>
-            <button onclick="rotateFan(15)">>></button>
+<br><br>
+<div style="display:inline-flex; align-items:center; gap:10px; margin-left:20px;">
+  <label for="cylSlider">Cyl</label>
+  <input style="width:500px;"
+    id="cylSlider"
+    type="range"
+    min="0"
+    max="8"
+    step="1"
+    value="0"
+    oninput="changeCylSlider(this.value)"
+  >
+</div>
+
+<br><br>
+<div style="display:inline-flex; align-items:center; gap:10px; margin-left:20px;">
+  <label for="fanRotationSlider">Axis</label>
+  <input style="width:500px;"
+
+    id="fanRotationSlider"
+    type="range"
+    min="0"
+    max="360"
+    step="15"
+    value="0"
+    oninput="rotateFanSlider(this.value)"
+  >
+  <span style="display:none" id="fanRotationValue">0°</span>
+</div>
+
+<script>
+
+let cylSliderPrevious = 0;
+let fanRotationPrevious = 0;
+
+function changeCylSlider(value) {
+  value = Number(value);
+  const difference = value - cylSliderPrevious;
+
+  if (difference !== 0) {
+    changeCyl(difference * 0.25);
+    cylSliderPrevious = value;
+  }
+}
+
+function rotateFanSlider(value) {
+  value = Number(value);
+  const difference = value - fanRotationPrevious;
+
+  if (difference !== 0) {
+    rotateFan(difference);
+    fanRotationPrevious = value;
+  }
+
+  document.getElementById("fanRotationValue").textContent =
+    value + "°";
+}
+</script>
+
 
 
           </div>
 <div style="margin-top:15px;">
- <span ><b>CYL Value <span style="color:darkblue" id="cylVal">0.00</span></b> </span>
+ <span ><b>CYL Value<br> <span style="color:darkblue" id="cylVal">0.00</span></b> </span>
 </div>
 
+<button id="fanBgToggle" onclick="toggleFanBackground()">
+  Image BG
+</button>
 
 
+<script>
+function toggleFanBackground() {
+  const wrapper = document.getElementById("fan-wrapper");
+  const button = document.getElementById("fanBgToggle");
+
+  const isGrey = wrapper.dataset.grey === "true";
+
+  if (isGrey) {
+    wrapper.style.backgroundImage =
+      'url("https://sp-rx.github.io/trainer_light/FCBG.jpg")';
+    wrapper.style.backgroundColor = "";
+    wrapper.dataset.grey = "false";
+    button.textContent = "Image BG";
+  } else {
+    wrapper.style.backgroundImage = "none";
+    wrapper.style.backgroundColor = "#ebebeb";
+    wrapper.dataset.grey = "true";
+    button.textContent = "Grey BG";
+  }
+}
+</script>
 
 
         </div> <!-- left-controls -->
@@ -1325,7 +1449,7 @@ const rawBlur = Math.min(
 );
 
 const NONLINEAR_EXP = 1;  // <1 = compress high values, >1 = exaggerate
-const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
+const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.007;
 
 
 for (let i = 0; i < totalShades; i++) {
@@ -1343,10 +1467,13 @@ const minLineWidth = cw * 0.006;
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
   const baseColor = 0;
-  const maxColor = deviceMode === 'ipad' ? 160 : 120;
+const maxColor = deviceMode === 'ipad' ? 160 : 160;
 
-  const val = Math.round(baseColor + shadeOffset * (maxColor - baseColor));
-  ctx.strokeStyle = `rgba(${val},${val},${val},${1.1 / totalShades})`;
+const val = Math.round(
+  baseColor + rawBlur * (maxColor - baseColor) / maxBlur
+);
+
+ctx.strokeStyle = `rgba(${val},${val},${val},${1.1 / totalShades})`;
 
 
 
@@ -1378,20 +1505,7 @@ ctx.arc(0, -dotOffset, dotRadius, 0, Math.PI * 2);
     ctx.restore();
   });
 
-/* Green opposite axis dots */
-[90, 270].forEach(a => {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate((a + angle + 90) * Math.PI / 180);
 
-  ctx.beginPath();
-  const dotRadius = cw * 0.008;
-  ctx.arc(0, -dotOffset, dotRadius, 0, Math.PI * 2);
-  ctx.fillStyle = '#1C5561';
-  ctx.fill();
-
-  ctx.restore();
-});
 
   /* Center white circle */
   ctx.beginPath();
