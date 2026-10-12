@@ -27,7 +27,7 @@
 
   }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   body {
     height: auto;
     justify-content: flex-start;
@@ -144,7 +144,7 @@
   border-radius:50px;
   padding:30px 0px 40px 0px;
   margin:0px 0;
-  width:700px;
+  width:800px;
 }
   #container {
     display: flex;
@@ -295,8 +295,8 @@
 #fanRotationSlider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: #444444;
   border: none;
@@ -870,72 +870,99 @@ function toggleBalancedFC() {
 </div>
 
 
-<div style="background-color:#ebebeb; width:90%; border-radius:50px; margin:2% auto; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+<!-- FAN CHART CONSOLE -->
+<div style="
+  background-color:#ebebeb;
+  width:90%;
+  border-radius:50px;
+  margin:2% auto;
+  padding:25px 20px;
+  box-sizing:border-box;
+">
 
+  <div style="
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    gap:25px;
+  ">
 
-<div><span><br><b>Your Current Astigmatism Chart</b></span></div>
+    <!-- LEFT SLIDER -->
+    <div style="
+      flex:0 0 70px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+    ">
+      <label for="cylSlider" style="font-weight:bold;text-align:center;">
+        Cyl<br>Diopter
+      </label>
 
-          <div style="margin-top:10px" id="fan-wrapper">
-
-
-            <canvas id="fan-container"></canvas>
-          </div>
-
-</div>
-
-    <div style="margin-top:10px"></div>
-
-    <div style="display:none;" class="toggle-button" onclick="toggleDiv(this)">
-      Show / Hide
+      <input
+        id="cylSlider"
+        type="range"
+        min="0"
+        max="8"
+        step="1"
+        value="0"
+        oninput="changeCylSlider(this.value)"
+        style="writing-mode:vertical-lr;direction:ltr;width:10px;height:180px;"
+      >
     </div>
 
-    <div class="toggle-content">
+    <!-- CENTRE CHART -->
+    <div id="fan-wrapper" style="
+      flex:1;
+      min-width:0;
+      margin-top:10px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    ">
+      <canvas id="fan-container" style="max-width:100%;"></canvas>
+    </div>
 
+    <!-- RIGHT SLIDER -->
+    <div style="
+      flex:0 0 70px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+    ">
+      <label for="fanRotationSlider" style="font-weight:bold;text-align:center;">
+        Axis<br>Direction
+      </label>
 
+      <input
+        id="fanRotationSlider"
+        type="range"
+        min="0"
+        max="180"
+        step="15"
+        value="0"
+        oninput="rotateFanSlider(this.value)"
+        style="writing-mode:vertical-lr;direction:ltr;width:10px;height:180px;"
+      >
 
-      <div style="display:none; margin-top:20px" class="header">
-        <button class="reso-btn" onclick="setMode('pc', this)">Normal Reso</button>
-        <button class="reso-btn" onclick="setMode('ipad', this)">Higher Reso</button>
-        <button id="fogBtn" onclick="toggleFogging()">No Blur</button>
-      </div>
+      <span id="fanRotationValue" style="display:none;">0°</span>
+    </div>
 
-      <div id="container">
-
-        <div id="left-controls">
-          <div>
-<span style="color:darkred; font-size:18px;">●</span>
-<b style="margin:0 8px;">Line</b>
-<span style="color:darkred; font-size:18px;">●</span>
-
-<br><br>
-<div style="display:inline-flex; align-items:center; gap:10px; margin-left:20px;">
-  <label for="cylSlider">Cyl</label>
-  <input style="width:500px;"
-    id="cylSlider"
-    type="range"
-    min="0"
-    max="8"
-    step="1"
-    value="0"
-    oninput="changeCylSlider(this.value)"
-  >
+  </div>
 </div>
 
-<br><br>
-<div style="display:inline-flex; align-items:center; gap:10px; margin-left:20px;">
-  <label for="fanRotationSlider">Axis</label>
-  <input style="width:500px;"
+<div style="margin-top:10px"></div>
 
-    id="fanRotationSlider"
-    type="range"
-    min="0"
-    max="360"
-    step="15"
-    value="0"
-    oninput="rotateFanSlider(this.value)"
-  >
-  <span style="display:none" id="fanRotationValue">0°</span>
-</div>
+
+
+
+
+
+
 
 <script>
 
@@ -969,7 +996,7 @@ function rotateFanSlider(value) {
 
 
           </div>
-<div style="margin-top:15px;">
+<div >
  <span ><b>CYL Value<br> <span style="color:darkblue" id="cylVal">0.00</span></b> </span>
 </div>
 
@@ -1120,6 +1147,44 @@ function toggleFanBackground() {
   </div>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <script>
@@ -1337,12 +1402,14 @@ if (minusAxis > 180) minusAxis -= 180;
 
 const minusPowerPart = `+${cylBlur.toFixed(2)} × ${minusAxis.toString().padStart(3,'0')}`;
 
-const fullText = `
-    <span style="color:#404040;">${description} Delta</span>
-<br>
-  <span style="color:darkred;">${powerPart}</span>
+const fullText = `  <span style="color:darkred;">${powerPart}</span>
   <span style="color:#404040;">&nbsp;&nbsp;or&nbsp;&nbsp;</span>
   <span style="color:#1C5561;">${minusPowerPart}</span>
+
+
+    <span style="display:none; color:#404040;">${description} Delta</span>
+<br>
+
 `;
 
 // Original (with description)
@@ -1413,7 +1480,7 @@ const cy = ch / 2;
   const dotOffset = cw * 0.275;
   const fanAngles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
   const maxBlur = deviceMode === 'ipad' ? 2.5 : 1.5;
-  const totalShades = 12; // number of incremental layers
+  const totalShades = 2; // number of incremental layers
   
   ctx.clearRect(0, 0, cw, ch);
 
@@ -1449,7 +1516,7 @@ const rawBlur = Math.min(
 );
 
 const NONLINEAR_EXP = 1;  // <1 = compress high values, >1 = exaggerate
-const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.007;
+const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
 
 
 for (let i = 0; i < totalShades; i++) {
@@ -1467,13 +1534,13 @@ const minLineWidth = cw * 0.006;
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
   const baseColor = 0;
-const maxColor = deviceMode === 'ipad' ? 160 : 160;
+const maxColor = deviceMode === 'ipad' ? 180 : 180;
 
-const val = Math.round(
-  baseColor + rawBlur * (maxColor - baseColor) / maxBlur
-);
+const GREY_STEP = 10; // Higher = bigger steps
+const rawVal = baseColor + rawBlur * (maxColor - baseColor) / maxBlur;
+const val = Math.round(rawVal / GREY_STEP) * GREY_STEP;
 
-ctx.strokeStyle = `rgba(${val},${val},${val},${1.1 / totalShades})`;
+ctx.strokeStyle = `rgba(${val},${val},${val},${1.3/ totalShades})`;
 
 
 
