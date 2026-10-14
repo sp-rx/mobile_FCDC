@@ -942,9 +942,9 @@ function toggleBalancedFC() {
         id="fanRotationSlider"
         type="range"
         min="0"
-        max="180"
+        max="360"
         step="15"
-        value="0"
+        value="180"
         oninput="rotateFanSlider(this.value)"
         style="writing-mode:vertical-lr;direction:ltr;width:10px;height:180px;"
       >
@@ -1003,6 +1003,32 @@ function rotateFanSlider(value) {
 <button id="fanBgToggle" onclick="toggleFanBackground()">
   Image BG
 </button>
+
+
+
+<div class="fan-adjust-controls">
+  <label>
+    <span>Blur Width: <b id="blurWidthValue">1.00</b></span>
+    <input id="blurWidthSlider" type="range"
+           min="0" max="3" step="0.05" value="1">
+  </label>
+
+
+<label>
+  <span>Max Grey Intensity: <b id="maxColorValue">220</b></span>
+  <input id="maxColorSlider" type="range"
+         min="0" max="450" step="1" value="220">
+</label>
+
+</div>
+
+<style>
+.fan-adjust-controls input[type="range"] {
+  accent-color: #555;
+}
+</style>
+
+
 
 
 <script>
@@ -1103,6 +1129,8 @@ function toggleFanBackground() {
   <span style="font-size:25px"><b>Astigmatism condition <span>- </span> <span id="astigCylVal">0.00</span> <span> x </span> <span id="astigAxisVal">180</span></b></span>
 </div>
 
+
+
 <br>
 
 
@@ -1188,6 +1216,25 @@ function toggleFanBackground() {
 
 
 <script>
+
+let blurWidth = 1;
+let greyStep = 10;
+
+document.getElementById('blurWidthSlider').addEventListener('input', function() {
+  blurWidth = Number(this.value);
+  document.getElementById('blurWidthValue').textContent = blurWidth.toFixed(2);
+  drawFan();
+});
+
+document.getElementById('greyStepSlider').addEventListener('input', function() {
+  greyStep = Number(this.value);
+  document.getElementById('greyStepValue').textContent = greyStep;
+  drawFan();
+});
+
+
+
+
 const aCanvas = document.getElementById("astigCanvas");
 const aCtx = aCanvas.getContext("2d");
 
@@ -1351,6 +1398,20 @@ function selectDC(val){
 
 
 <script>
+
+let maxColor = 220;
+
+document.getElementById('maxColorSlider').addEventListener('input', function() {
+  maxColor = Number(this.value);
+  document.getElementById('maxColorValue').textContent = maxColor;
+  drawFan();
+});
+
+
+
+
+
+
 const canvas = document.getElementById('fan-container');
 const ctx = canvas.getContext('2d');
 
@@ -1516,7 +1577,8 @@ const rawBlur = Math.min(
 );
 
 const NONLINEAR_EXP = 1;  // <1 = compress high values, >1 = exaggerate
-const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
+const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01 * blurWidth;
+
 
 
 for (let i = 0; i < totalShades; i++) {
@@ -1534,10 +1596,10 @@ const minLineWidth = cw * 0.006;
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
   const baseColor = 0;
-const maxColor = deviceMode === 'ipad' ? 180 : 180;
+const maxColorValue = maxColor;
 
-const GREY_STEP = 10; // Higher = bigger steps
-const rawVal = baseColor + rawBlur * (maxColor - baseColor) / maxBlur;
+const GREY_STEP = greyStep;
+const rawVal = baseColor + rawBlur * (maxColorValue - baseColor) / maxBlur;
 const val = Math.round(rawVal / GREY_STEP) * GREY_STEP;
 
 ctx.strokeStyle = `rgba(${val},${val},${val},${1.3/ totalShades})`;
